@@ -1,0 +1,6 @@
+@XInstallBotProfile_HostAddress = http://localhost:5242
+
+GET {{XInstallBotProfile_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
