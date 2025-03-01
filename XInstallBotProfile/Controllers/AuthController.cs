@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using XInstallBotProfile.Context;
+using XInstallBotProfile.Generate;
+using XInstallBotProfile.Models;
 
 namespace XInstallBotProfile.Controllers
 {
@@ -19,24 +21,76 @@ namespace XInstallBotProfile.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest model)
         {
-            // Найдем пользователя по логину
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Login == model.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == model.Email);
 
             if (user == null)
             {
                 return Unauthorized("Неверный логин или пароль.");
             }
 
-            // Проверим пароль
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
             if (!isPasswordValid)
             {
                 return Unauthorized("Неверный логин или пароль.");
             }
 
-            // Если пароль верен, возвращаем уже сгенерированный ранее JWT токен
-            return Ok(new { Token = user.JwtToken });
+            // Генерируем новые токены
+            var newAccessToken = TokenGenerator.GenerateAccessToken(user.Login);
+            var newRefreshToken = TokenGenerator.GenerateRefreshToken();
+
+            // Обновляем Refresh Token в базе (перезаписываем pre-login токен)
+            user.JwtToken = newRefreshToken;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            });
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.JwtToken == request.RefreshToken);
+
+            if (user == null)
+            {
+                return BadRequest("Некорректный refresh-токен.");
+            }
+
+            // Удаляем refresh-токен (чтобы нельзя было обновить access-токен)
+            user.JwtToken = null;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Вы успешно вышли из системы." });
+        }
+
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.JwtToken == request.RefreshToken);
+
+            if (user == null)
+            {
+                return Unauthorized("Неверный refresh-токен.");
+            }
+
+            // Генерируем новый Access Token
+            var newAccessToken = TokenGenerator.GenerateAccessToken(user.Login);
+            var newRefreshToken = TokenGenerator.GenerateRefreshToken();
+
+            // Обновляем refresh-токен в базе
+            user.JwtToken = newRefreshToken;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            });
         }
     }
 }

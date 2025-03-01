@@ -38,7 +38,7 @@ namespace XInstallBotProfile.Service
                         var login = CredentialGenerator.GenerateLogin();
                         var password = CredentialGenerator.GeneratePassword();
                         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
-                        var jwtToken = TokenGenerator.GenerateJwtToken(login);
+                        var jwtToken = TokenGenerator.GenerateAccessToken(login);
 
                         var newUser = new Models.User
                         {

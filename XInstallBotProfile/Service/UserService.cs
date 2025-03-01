@@ -15,7 +15,7 @@ namespace XInstallBotProfile.Service
         public void RegisterUser(string login, string password)
         {
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);  // Для безопасности храните хэш пароля
-            var jwtToken = TokenGenerator.GenerateJwtToken(login);
+            var jwtToken = TokenGenerator.GenerateAccessToken(login);
 
             var user = new Models.User
             {
