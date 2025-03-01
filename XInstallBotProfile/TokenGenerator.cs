@@ -7,15 +7,15 @@ namespace XInstallBotProfile
 {
     public class TokenGenerator
     {
-        private static string _secretKey;
-
-        public TokenGenerator(IConfiguration configuration)
-        {
-            _secretKey = configuration["JwtSettings:SecretKey"];
-        } 
+        private static string _secretKey = "s2hG93b0qy32xvwp1PqX0M1aO9lmU4cT";
 
         public static string GenerateJwtToken(string username)
         {
+            // Проверка на null для _secretKey
+            if (string.IsNullOrEmpty(_secretKey))
+            {
+                throw new InvalidOperationException("Secret key is not configured.");
+            }
             var claims = new[]
             {
             new Claim(ClaimTypes.Name, username)

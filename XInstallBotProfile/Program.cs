@@ -7,7 +7,6 @@ using XInstallBotProfile;
 var builder = WebApplication.CreateBuilder(args);
 
 string botToken = "7947836624:AAHGUWdQslw4iCpQJDIG_oURFdTfvGOZje8";
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
