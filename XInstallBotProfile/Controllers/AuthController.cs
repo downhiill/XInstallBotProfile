@@ -12,10 +12,12 @@ namespace XInstallBotProfile.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(ApplicationDbContext context)
+        public AuthController(ApplicationDbContext context, ILogger<AuthController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpPost("login")]
@@ -52,20 +54,38 @@ namespace XInstallBotProfile.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.JwtToken == request.RefreshToken);
-
-            if (user == null)
+            // Проверка на наличие refresh-токена в запросе
+            if (string.IsNullOrEmpty(request.RefreshToken))
             {
-                return BadRequest("Некорректный refresh-токен.");
+                return BadRequest("Refresh token не может быть пустым.");
             }
 
-            // Удаляем refresh-токен (чтобы нельзя было обновить access-токен)
-            user.JwtToken = null;
+            try
+            {
+                // Найдем пользователя с этим refresh-токеном
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.JwtToken == request.RefreshToken);
 
-            await _context.SaveChangesAsync();
+                if (user == null)
+                {
+                    return BadRequest("Некорректный refresh-токен.");
+                }
 
-            return Ok(new { message = "Вы успешно вышли из системы." });
+                // Удаляем refresh-токен (чтобы нельзя было обновить access-токен)
+                user.JwtToken = null;
+
+                // Сохраняем изменения в базе данных
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Вы успешно вышли из системы." });
+            }
+            catch (Exception ex)
+            {
+                // Логируем ошибку для отладки
+                _logger.LogError("Ошибка при выходе: {0}", ex.Message);
+                return StatusCode(500, "Ошибка на сервере.");
+            }
         }
+    
 
 
         [HttpPost("refresh")]
