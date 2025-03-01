@@ -55,12 +55,22 @@ namespace XInstallBotProfile.Controllers
             // Сохраняем изменения в базе данных
             await _context.SaveChangesAsync();
 
+            // Устанавливаем refresh token в HttpOnly cookie
+            Response.Cookies.Append("refreshToken", newRefreshTokenToUpdate, new CookieOptions
+            {
+                HttpOnly = true,   // Запрещает доступ к cookie через JavaScript
+                Secure = true,     // Cookie будет отправляться только по HTTPS
+                SameSite = SameSiteMode.Strict, // Защищает от межсайтовых запросов
+                Expires = DateTime.UtcNow.AddDays(7) // Устанавливаем срок действия cookie (например, 7 дней)
+            });
+
+            // Возвращаем access token в ответе
             return Ok(new
             {
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshTokenToUpdate
+                AccessToken = newAccessToken
             });
         }
+
 
 
 
