@@ -36,20 +36,34 @@ namespace XInstallBotProfile.Controllers
                 return Unauthorized("Неверный логин или пароль.");
             }
 
-            // Генерируем новые токены
-            var newAccessToken = TokenGenerator.GenerateAccessToken(user.Login);
-            var newRefreshToken = TokenGenerator.GenerateRefreshToken();
+            // Если у пользователя нет refresh token, генерируем новый
+            if (string.IsNullOrEmpty(user.JwtToken))
+            {
+                var newRefreshToken = TokenGenerator.GenerateRefreshToken();
+                user.JwtToken = newRefreshToken; // Сохраняем новый refresh token
+            }
 
-            // Обновляем Refresh Token в базе (перезаписываем pre-login токен)
-            user.JwtToken = newRefreshToken;
+            // Генерация нового access токена
+            var newAccessToken = TokenGenerator.GenerateAccessToken(user.Login);
+
+            // Генерация нового refresh токена (если нужно обновить)
+            var newRefreshTokenToUpdate = TokenGenerator.GenerateRefreshToken();
+
+            // Обновляем refresh токен в базе данных (если требуется)
+            user.JwtToken = newRefreshTokenToUpdate;
+
+            // Сохраняем изменения в базе данных
             await _context.SaveChangesAsync();
 
             return Ok(new
             {
                 AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken
+                RefreshToken = newRefreshTokenToUpdate
             });
         }
+
+
+
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
