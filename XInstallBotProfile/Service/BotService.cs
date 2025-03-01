@@ -2,8 +2,10 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using XInstallBotProfile.Context;
+using XInstallBotProfile.Generate;
 
-namespace XInstallBotProfile
+namespace XInstallBotProfile.Service
 {
     public class BotService
     {
@@ -38,7 +40,7 @@ namespace XInstallBotProfile
                         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
                         var jwtToken = TokenGenerator.GenerateJwtToken(login);
 
-                        var newUser = new User
+                        var newUser = new Models.User
                         {
                             Login = login,
                             PasswordHash = passwordHash,
@@ -56,7 +58,7 @@ namespace XInstallBotProfile
                     else
                     {
                         // Если пользователь уже есть в базе данных
-                        string message = "Вы уже зарегистрированы. Приятного общения!";
+                        string message = "Вы уже зарегистрированы.";
                         await botClient.SendTextMessageAsync(chatId, message);
                     }
                 }

@@ -1,4 +1,4 @@
-﻿namespace XInstallBotProfile
+﻿namespace XInstallBotProfile.Models
 {
     public class User
     {

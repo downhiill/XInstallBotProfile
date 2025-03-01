@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using XInstallBotProfile.Generate;
+using XInstallBotProfile.Service;
 
 namespace XInstallBotProfile.Controllers
 {

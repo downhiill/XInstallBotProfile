@@ -3,7 +3,7 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace XInstallBotProfile
+namespace XInstallBotProfile.Service
 {
     public class BotStartupService : BackgroundService
     {

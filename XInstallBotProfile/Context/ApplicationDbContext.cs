@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using XInstallBotProfile.Models;
 
-namespace XInstallBotProfile
+namespace XInstallBotProfile.Context
 {
     public class ApplicationDbContext : DbContext
     {

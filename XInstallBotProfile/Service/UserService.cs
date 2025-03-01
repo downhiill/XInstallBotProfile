@@ -1,4 +1,7 @@
-﻿namespace XInstallBotProfile
+﻿using XInstallBotProfile.Context;
+using XInstallBotProfile.Generate;
+
+namespace XInstallBotProfile.Service
 {
     public class UserService
     {
@@ -14,7 +17,7 @@
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);  // Для безопасности храните хэш пароля
             var jwtToken = TokenGenerator.GenerateJwtToken(login);
 
-            var user = new User
+            var user = new Models.User
             {
                 Login = login,
                 PasswordHash = passwordHash,

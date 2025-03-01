@@ -1,4 +1,4 @@
-﻿namespace XInstallBotProfile
+﻿namespace XInstallBotProfile.Generate
 {
     public class CredentialGenerator
     {
