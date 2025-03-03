@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
-using XInstallBotProfile.Service;
 using XInstallBotProfile.Context;
 using Microsoft.OpenApi.Models;
+using XInstallBotProfile.Service.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +18,7 @@ builder.Services.AddSwaggerGen();
 // Add DbContext and services
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<UserBotService>();
 
 // Add BotService with factory method to resolve dependencies
 builder.Services.AddSingleton<BotService>(sp =>

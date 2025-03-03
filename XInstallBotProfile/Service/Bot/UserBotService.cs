@@ -1,13 +1,13 @@
 ﻿using XInstallBotProfile.Context;
 using XInstallBotProfile.Generate;
 
-namespace XInstallBotProfile.Service
+namespace XInstallBotProfile.Service.Bot
 {
-    public class UserService
+    public class UserBotService
     {
         private ApplicationDbContext _context;
 
-        public UserService(ApplicationDbContext context)
+        public UserBotService(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -21,7 +21,8 @@ namespace XInstallBotProfile.Service
             {
                 Login = login,
                 PasswordHash = passwordHash,
-                JwtToken = jwtToken
+                JwtToken = jwtToken,
+                IsDsp = true
             };
 
             _context.Users.Add(user);

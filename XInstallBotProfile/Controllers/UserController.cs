@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using XInstallBotProfile.Generate;
-using XInstallBotProfile.Service;
+using XInstallBotProfile.Service.Bot;
 
 namespace XInstallBotProfile.Controllers
 {
@@ -8,9 +8,9 @@ namespace XInstallBotProfile.Controllers
     [ApiController]
     public class UserController : Controller
     {
-        private readonly UserService _userService;
+        private readonly UserBotService _userService;
 
-        public UserController(UserService userService)
+        public UserController(UserBotService userService)
         {
             _userService = userService;
         }

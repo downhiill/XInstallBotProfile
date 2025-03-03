@@ -5,7 +5,7 @@ using Telegram.Bot.Types.Enums;
 using XInstallBotProfile.Context;
 using XInstallBotProfile.Generate;
 
-namespace XInstallBotProfile.Service
+namespace XInstallBotProfile.Service.Bot
 {
     public class BotService
     {
