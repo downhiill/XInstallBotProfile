@@ -114,33 +114,33 @@ namespace XInstallBotProfile.Service.AdminPanelService
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task SaveUserChanges(int id, UpdateUsernameRequest usernameRequest, UpdateFlagsRequest flagsRequest)
+        public async Task SaveUserChanges(SaveUserRequest request)
         {
-            var user = await GetUserByIdAsync(id);
+            var user = await GetUserByIdAsync(request.Id);
 
             // Проверяем, есть ли изменения
-            if (!HasUserChanged(user, usernameRequest, flagsRequest))
+            if (!HasUserChanged(user, request.UsernameRequest, request.FlagsRequest))
             {
                 return; // Ничего не изменилось — сохранять не нужно
             }
 
             // Обновляем никнейм, если передан запрос на его изменение
-            if (usernameRequest != null)
+            if (request.UsernameRequest != null)
             {
-                bool nicknameTaken = await _dbContext.Users.AnyAsync(u => u.Nickname == usernameRequest.Username && u.Id != id);
+                bool nicknameTaken = await _dbContext.Users.AnyAsync(u => u.Nickname == request.UsernameRequest.Username && u.Id != request.Id);
                 if (nicknameTaken)
                 {
                     throw new Exception("Никнейм уже занят");
                 }
-                user.Nickname = usernameRequest.Username;
+                user.Nickname = request.UsernameRequest.Username;
             }
 
             // Обновляем флаги, если передан запрос на их изменение
-            if (flagsRequest != null)
+            if (request.FlagsRequest != null)
             {
-                user.IsDsp = flagsRequest.Flag1;
-                user.IsDspInApp = flagsRequest.Flag2;
-                user.IsDspBanner = flagsRequest.Flag3;
+                user.IsDsp = request.FlagsRequest.Flag1;
+                user.IsDspInApp = request.FlagsRequest.Flag2;
+                user.IsDspBanner = request.FlagsRequest.Flag3;
             }
 
             // Сохраняем только если были изменения

@@ -1,39 +1,27 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using XInstallBotProfile.Context;
+using XInstallBotProfile.Service.AdminPanelService;
 using XInstallBotProfile.Service.AdminPanelService.Models.Request;
 
 namespace XInstallBotProfile.Controllers
 {
-    [Authorize(Roles = "Admin")] // Доступ только для админа
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/admin")]
     public class AdminController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUserService _userService;
 
-        public AdminController(ApplicationDbContext context)
+        public AdminController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
         // 1. Получение списка пользователей
         [HttpGet("users")]
         public async Task<IActionResult> GetUsers()
         {
-            var users = await _context.Users
-                .Select(u => new
-                {
-                    u.Id,
-                    u.Nickname,
-                    u.CreatedAt,
-                    u.IsDsp,
-                    u.IsDspInApp,
-                    u.IsDspBanner
-                })
-                .ToListAsync();
-
+            var users = await _userService.GetAllUsers();
             return Ok(users);
         }
 
@@ -41,78 +29,41 @@ namespace XInstallBotProfile.Controllers
         [HttpPut("user/{id}/flags")]
         public async Task<IActionResult> UpdateUserFlags(int id, [FromBody] UpdateFlagsRequest request)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-                return NotFound("Пользователь не найден");
-
-            user.IsDsp = request.Flag1;
-            user.IsDspInApp = request.Flag2;
-            user.IsDspBanner = request.Flag3;
-
-            await _context.SaveChangesAsync();
-            return Ok("Флаги обновлены");
+            request.Id = id; // Устанавливаем ID из маршрута
+            var result = await _userService.UpdateUserFlags(request);
+            return Ok(result);
         }
 
         // 3. Удаление пользователя
         [HttpDelete("user/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-                return NotFound("Пользователь не найден");
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
+            await _userService.DeleteUser(id);
             return Ok("Пользователь удалён");
         }
 
-        // 4. Добавление пользователя (по умолчанию ник пустой)
+        // 4. Добавление пользователя
         [HttpPost("user")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
         {
-            // Проверяем, занят ли никнейм, если он передан
-            if (!string.IsNullOrWhiteSpace(request.Username))
-            {
-                bool usernameExists = await _context.Users.AnyAsync(u => u.Nickname == request.Username);
-                if (usernameExists)
-                    return BadRequest("Никнейм уже занят");
-            }
-
-            var newUser = new Models.User
-            {
-                Nickname = request.Username ?? string.Empty, // Если ник не передан, оставляем пустым
-                CreatedAt = DateTime.UtcNow,
-                IsAdmin = false
-            };
-
-            _context.Users.Add(newUser);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { Message = "Пользователь создан", UserId = newUser.Id });
+            var result = await _userService.CreateUser(request);
+            return Ok(result);
         }
 
-        // 5. Обновление никнейма пользователя (с проверкой на дублирование)
+        // 5. Обновление никнейма
         [HttpPut("user/{id}/username")]
         public async Task<IActionResult> UpdateUsername(int id, [FromBody] UpdateUsernameRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Username))
-                return BadRequest("Никнейм не может быть пустым");
+            var result = await _userService.UpdateUsername(id, request);
+            return Ok(result);
+        }
 
-            bool usernameExists = await _context.Users.AnyAsync(u => u.Nickname == request.Username && u.Id != id);
-            if (usernameExists)
-                return BadRequest("Никнейм уже занят");
-
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-                return NotFound("Пользователь не найден");
-
-            user.Nickname = request.Username;
-            await _context.SaveChangesAsync();
-
-            return Ok("Никнейм обновлён");
+        // 6. Общий API для сохранения всех изменений пользователя (ник и флаги)
+        [HttpPut("user/save")]
+        public async Task<IActionResult> SaveUserChanges([FromBody] SaveUserRequest request)
+        {
+            await _userService.SaveUserChanges(request);
+            return Ok("Изменения сохранены");
         }
     }
-    
-
 }
