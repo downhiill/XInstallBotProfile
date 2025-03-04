@@ -112,29 +112,48 @@ namespace XInstallBotProfile.Controllers
     
 
 
+        
         [HttpGet("refresh")]
-        public async Task<IActionResult> RefreshToken(HttpContext httpContext)
+        public async Task<IActionResult> RefreshToken()
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.JwtToken == httpContext.Request.Cookies["refreshToken"]);
+            // Получаем refresh-токен из кук
+            var refreshToken = HttpContext.Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return Unauthorized("Refresh-токен отсутствует.");
+            }
+
+            // Ищем пользователя по refresh-токену
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.JwtToken == refreshToken);
 
             if (user == null)
             {
                 return Unauthorized("Неверный refresh-токен.");
             }
 
-            // Генерируем новый Access Token
+            // Генерируем новые токены
             var newAccessToken = TokenGenerator.GenerateAccessToken(user.Login);
             var newRefreshToken = TokenGenerator.GenerateRefreshToken();
 
-            // Обновляем refresh-токен в базе
+            // Обновляем refresh-токен в БД
             user.JwtToken = newRefreshToken;
             await _context.SaveChangesAsync();
 
+            // Устанавливаем новый refresh-токен в куки
+            Response.Cookies.Append("refreshToken", newRefreshToken, new CookieOptions
+            {
+                HttpOnly = true, // Доступен только через HTTP (нельзя прочитать через JS)
+                Secure = true, // Только по HTTPS
+                SameSite = SameSiteMode.Strict, // Используется только в рамках одного сайта
+                Expires = DateTime.UtcNow.AddDays(7) // Срок жизни куки
+            });
+
             return Ok(new
             {
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken
+                AccessToken = newAccessToken
             });
         }
+
     }
 }
