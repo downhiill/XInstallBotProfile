@@ -21,9 +21,9 @@ namespace XInstallBotProfile.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest model)
+        public async Task<IActionResult> Login([FromBody] Service.AdminPanelService.Models.Request.LoginRequest model)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == model.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == model.Login);
 
             if (user == null)
             {
@@ -112,10 +112,10 @@ namespace XInstallBotProfile.Controllers
     
 
 
-        [HttpPost("refresh")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshRequest request)
+        [HttpGet("refresh")]
+        public async Task<IActionResult> RefreshToken(HttpContext httpContext)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.JwtToken == request.RefreshToken);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.JwtToken == httpContext.Request.Cookies["refreshToken"]);
 
             if (user == null)
             {
