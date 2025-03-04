@@ -5,7 +5,7 @@ using XInstallBotProfile.Service.AdminPanelService.Models.Request;
 
 namespace XInstallBotProfile.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/admin")]
     public class AdminController : ControllerBase
