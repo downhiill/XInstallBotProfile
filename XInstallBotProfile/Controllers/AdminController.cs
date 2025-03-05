@@ -5,7 +5,7 @@ using XInstallBotProfile.Service.AdminPanelService.Models.Request;
 
 namespace XInstallBotProfile.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]  // Это обеспечит доступ только для пользователей с ролью "Admin"
     [ApiController]
     [Route("api/admin")]
     public class AdminController : ControllerBase
