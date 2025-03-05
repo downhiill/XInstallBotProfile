@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using XInstallBotProfile.Context;
@@ -11,9 +12,11 @@ using XInstallBotProfile.Context;
 namespace XInstallBotProfile.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250305225716_CreateNewTableStatisticType")]
+    partial class CreateNewTableStatisticType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace XInstallBotProfile.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("StatisticTypeUser", b =>
-                {
-                    b.Property<int>("StatisticTypesId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("StatisticTypesId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("StatisticTypeUser");
-                });
 
             modelBuilder.Entity("XInstallBotProfile.Models.StatisticType", b =>
                 {
@@ -101,21 +89,6 @@ namespace XInstallBotProfile.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("user_auth_info", (string)null);
-                });
-
-            modelBuilder.Entity("StatisticTypeUser", b =>
-                {
-                    b.HasOne("XInstallBotProfile.Models.StatisticType", null)
-                        .WithMany()
-                        .HasForeignKey("StatisticTypesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("XInstallBotProfile.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
