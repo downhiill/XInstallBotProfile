@@ -2,6 +2,7 @@
 using Telegram.Bot.Requests.Abstractions;
 using XInstallBotProfile.Context;
 using XInstallBotProfile.Controllers;
+using XInstallBotProfile.Models;
 using XInstallBotProfile.Service.AdminPanelService.Models.Request;
 using XInstallBotProfile.Service.AdminPanelService.Models.Response;
 
@@ -26,19 +27,20 @@ namespace XInstallBotProfile.Service.AdminPanelService
                         Id = u.Id,
                         Username = u.Nickname,
                         CreatedAt = u.CreatedAt,
-                        Flag1 = u.IsDsp,
-                        Flag2 = u.IsDspInApp,
-                        Flag3 = u.IsDspBanner
+                        Login = u.Login, // Логин
+                        PasswordHash = u.PasswordHash, // Хэш пароля
+                        PanelTypes = u.StatisticTypes.Select(p => p.Id).ToList() // Список доступных типов статистики (ID)
                     })
                     .ToListAsync()
             };
         }
 
 
+
         public async Task<CreateUserResponse> CreateUser(CreateUserRequest request)
         {
             // Проверяем, занят ли уже ник
-            var existingUser = _dbContext.Users
+            var existingUser = await _dbContext.Users
                 .Where(u => u.Nickname == request.Username)
                 .FirstOrDefaultAsync();
 
@@ -47,31 +49,48 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 throw new Exception("Никнейм уже занят");
             }
 
-            // Создаем нового пользователя
-            var user = new UserModel
+            // Генерируем логин и пароль
+            var login = request.Username; // Логин можно использовать как никнейм
+            var password = "GeneratedPassword123"; // Генерация пароля (в реальности лучше сгенерировать случайно)
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+            // Получаем ID доступных типов панелей (связь с StatisticTypes)
+            var panelTypes = new List<StatisticType>
             {
-                Username = request.Username,
-                CreatedAt = DateTime.UtcNow,
-                Flag1 = true,
-                Flag2 = false,
-                Flag3 = false
+                new StatisticType { Id = 1, Name = "Type1" }, // Пример типов панелей
+                new StatisticType { Id = 2, Name = "Type2" }
             };
 
-            // Добавляем пользователя в базу
+            // Создаем нового пользователя для базы данных
+            var user = new User
+            {
+                Nickname = request.Username,
+                CreatedAt = DateTime.UtcNow,
+                Login = login, // Устанавливаем логин
+                PasswordHash = passwordHash, // Устанавливаем хэш пароля
+                IsDsp = true, // Пример значения
+                IsDspInApp = false, // Пример значения
+                IsDspBanner = false, // Пример значения
+                StatisticTypes = panelTypes // Связываем с доступными типами панелей
+            };
+
+            // Добавляем пользователя в базу данных
+            _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
             // Возвращаем модель ответа
             return new CreateUserResponse
             {
                 Id = user.Id,
-                Username = user.Username,
+                Username = user.Nickname, // Или user.Login, в зависимости от того, что вы хотите использовать
                 CreatedAt = user.CreatedAt,
-                IsDsp = user.Flag1,
-                IsDspInApp = user.Flag2,
-                IsDspBanner = user.Flag3
-
+                Login = user.Login,
+                PasswordHash = user.PasswordHash,
+                PanelTypes = user.StatisticTypes.Select(st => st.Id).ToList() // Преобразуем статистические типы в список строк
             };
         }
+
+
 
         public async Task<UpdateUsernameResponse> UpdateUsername(int id, UpdateUsernameRequest request)
         {
