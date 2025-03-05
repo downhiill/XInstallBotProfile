@@ -71,34 +71,40 @@ namespace XInstallBotProfile.Controllers
             });
         }
 
-
-
-
-
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+        public async Task<IActionResult> Logout()
         {
-            // Проверка на наличие refresh-токена в запросе
-            if (string.IsNullOrEmpty(request.RefreshToken))
+            // Получаем refresh-токен из куки
+            var refreshToken = HttpContext.Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrEmpty(refreshToken))
             {
-                return BadRequest("Refresh token не может быть пустым.");
+                return Unauthorized("Refresh-токен отсутствует.");
             }
 
             try
             {
-                // Найдем пользователя с этим refresh-токеном
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.JwtToken == request.RefreshToken);
+                // Находим пользователя с этим refresh-токеном
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.JwtToken == refreshToken);
 
                 if (user == null)
                 {
-                    return BadRequest("Некорректный refresh-токен.");
+                    return Unauthorized("Неверный refresh-токен.");
                 }
 
-                // Удаляем refresh-токен (чтобы нельзя было обновить access-токен)
+                // Удаляем refresh-токен из базы данных, чтобы нельзя было его использовать для обновления токенов
                 user.JwtToken = null;
 
                 // Сохраняем изменения в базе данных
                 await _context.SaveChangesAsync();
+
+                // Очищаем куки с refresh-токеном на стороне клиента
+                Response.Cookies.Delete("refreshToken", new CookieOptions
+                {
+                    HttpOnly = true, // Доступен только через HTTP (нельзя прочитать через JS)
+                    Secure = true, // Только для HTTPS
+                    SameSite = SameSiteMode.Strict // Используется только в рамках одного сайта
+                });
 
                 return Ok(new { message = "Вы успешно вышли из системы." });
             }
@@ -109,6 +115,9 @@ namespace XInstallBotProfile.Controllers
                 return StatusCode(500, "Ошибка на сервере.");
             }
         }
+
+        
+        
     
 
 
