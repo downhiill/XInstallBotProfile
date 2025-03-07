@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using XInstallBotProfile.Models;
 using XInstallBotProfile.Service.AdminPanelService;
 using XInstallBotProfile.Service.AdminPanelService.Models.Request;
 
@@ -32,14 +34,6 @@ namespace XInstallBotProfile.Controllers
             request.Id = id; // Устанавливаем ID из маршрута
             var result = await _userService.UpdateUserFlags(request);
             return Ok(result);
-        }
-
-        // 3. Удаление пользователя
-        [HttpDelete("user/{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
-        {
-            await _userService.DeleteUser(id);
-            return Ok("Пользователь удалён");
         }
 
         // 4. Добавление пользователя
@@ -91,6 +85,37 @@ namespace XInstallBotProfile.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, "Ошибка на сервере.");
+            }
+        }
+
+        [HttpPost("saveUserData")]
+        public async Task<IActionResult> SaveUserData([FromBody] User user)
+        {
+            if (user == null)
+                return BadRequest("Некорректные данные пользователя.");
+
+            try
+            {
+                int userId = await _userService.SaveUserAsync(user);
+                return Ok(new { message = "Пользователь успешно сохранен!", userId });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ошибка при сохранении пользователя.");
+            }
+        }
+
+        [HttpDelete("deleteUsers")]
+        public async Task<IActionResult> DeleteUsers([FromBody] List<int> userIds)
+        {
+            try
+            {
+                await _userService.DeleteUser(userIds);
+                return Ok(new { message = "Пользователи успешно удалены!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
             }
         }
     }

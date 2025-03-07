@@ -1,4 +1,5 @@
-﻿using XInstallBotProfile.Service.AdminPanelService.Models.Request;
+﻿using XInstallBotProfile.Models;
+using XInstallBotProfile.Service.AdminPanelService.Models.Request;
 using XInstallBotProfile.Service.AdminPanelService.Models.Response;
 
 namespace XInstallBotProfile.Service.AdminPanelService
@@ -10,6 +11,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
         public Task<UpdateUsernameResponse> UpdateUsername(int id, UpdateUsernameRequest request);
         public Task<UpdateFlagsResponse> UpdateUserFlags(UpdateFlagsRequest request);
         public Task SaveUserChanges(SaveUserRequest request);
-        public Task DeleteUser(int id);
+        public Task<int> SaveUserAsync(User user);
+        public Task DeleteUser(List<int> userIds);
     }
 }

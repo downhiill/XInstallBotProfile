@@ -35,8 +35,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
             };
         }
 
-
-
         public async Task<CreateUserResponse> CreateUser(CreateUserRequest request)
         {
             // Проверяем, занят ли уже ник
@@ -50,47 +48,39 @@ namespace XInstallBotProfile.Service.AdminPanelService
             }
 
             // Генерируем логин и пароль
-            var login = request.Username; // Логин можно использовать как никнейм
-            var password = "GeneratedPassword123"; // Генерация пароля (в реальности лучше сгенерировать случайно)
+            var login = request.Username;
+            var password = "GeneratedPassword123";
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-            // Получаем ID доступных типов панелей (связь с StatisticTypes)
-            var panelTypes = new List<StatisticType>
-            {
-                new StatisticType { Id = 1, Name = "Type1" }, // Пример типов панелей
-                new StatisticType { Id = 2, Name = "Type2" }
-            };
+            // Только ID-шники панелей
+            var panelTypeIds = new List<int> { 1, 2, 3 };
 
-            // Создаем нового пользователя для базы данных
+            // Создаем пользователя
             var user = new User
             {
                 Nickname = request.Username,
                 CreatedAt = DateTime.UtcNow,
-                Login = login, // Устанавливаем логин
-                PasswordHash = passwordHash, // Устанавливаем хэш пароля
-                IsDsp = true, // Пример значения
-                IsDspInApp = false, // Пример значения
-                IsDspBanner = false, // Пример значения
-                StatisticTypes = panelTypes // Связываем с доступными типами панелей
+                Login = login,
+                PasswordHash = passwordHash,
+                IsDsp = true,
+                IsDspInApp = false,
+                IsDspBanner = false,
+                StatisticTypes = panelTypeIds.Select(id => new StatisticType { Id = id }).ToList()
             };
 
-            // Добавляем пользователя в базу данных
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
-            // Возвращаем модель ответа
+            // Возвращаем ответ
             return new CreateUserResponse
             {
                 Id = user.Id,
-                Username = user.Nickname, // Или user.Login, в зависимости от того, что вы хотите использовать
+                Username = user.Nickname,
                 CreatedAt = user.CreatedAt,
                 Login = user.Login,
-                PasswordHash = user.PasswordHash,
-                PanelTypes = user.StatisticTypes.Select(st => st.Id).ToList() // Преобразуем статистические типы в список строк
+                PanelTypes = panelTypeIds
             };
         }
-
-
 
         public async Task<UpdateUsernameResponse> UpdateUsername(int id, UpdateUsernameRequest request)
         {
@@ -122,14 +112,21 @@ namespace XInstallBotProfile.Service.AdminPanelService
             return new UpdateFlagsResponse { Id = user.Id, Flag1 = user.IsDsp, Flag2 = user.IsDspInApp, Flag3 = user.IsDspBanner };
         }
 
-        public async Task DeleteUser(int id)
+        public async Task DeleteUser(List<int> userIds)
         {
-            // Находим пользователя по ID
-            var user = await GetUserByIdAsync(id);
-            // Удаляем пользователя
-            _dbContext.Users.Remove(user);
+            if (userIds == null || userIds.Count == 0)
+                throw new ArgumentException("Список ID пользователей не может быть пустым.");
 
-            // Сохраняем изменения в БД
+            // Получаем всех пользователей с указанными ID
+            var users = await _dbContext.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToListAsync();
+
+            if (users.Count == 0)
+                throw new Exception("Пользователи с указанными ID не найдены.");
+
+            // Удаляем пользователей
+            _dbContext.Users.RemoveRange(users);
             await _dbContext.SaveChangesAsync();
         }
 
@@ -164,6 +161,16 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
             // Сохраняем только если были изменения
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<int> SaveUserAsync(User user)
+        {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user), "Пользователь не может быть null");
+
+            _dbContext.Users.Add(user);
+            await _dbContext.SaveChangesAsync();
+            return user.Id; // Возвращаем ID сохраненного пользователя
         }
 
         private async Task<XInstallBotProfile.Models.User> GetUserByIdAsync(int id)
