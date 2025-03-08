@@ -111,12 +111,6 @@ namespace XInstallBotProfile.Controllers
             }
         }
 
-        
-        
-    
-
-
-        
         [HttpGet("refresh")]
         public async Task<IActionResult> RefreshToken()
         {
