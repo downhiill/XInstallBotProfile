@@ -226,17 +226,17 @@ namespace XInstallBotProfile.Service.AdminPanelService
             return new UpdateUsernameResponse { Id = user.Id, Username = user.Nickname };
         }
 
-        public async Task<UpdateFlagsResponse> UpdateUserFlags(UpdateFlagsRequest request)
+        public async Task<UpdateFlagsResponse> UpdateUserFlags(int id, UpdateFlagsRequest request)
         {
-            var user = await GetUserByIdAsync(request.Id);
+            var user = await GetUserByIdAsync(id);
 
-            user.IsDsp = request.Flag1;
-            user.IsDspInApp = request.Flag2;
-            user.IsDspBanner = request.Flag3;
+            user.IsDsp = request.IsDsp;
+            user.IsDspInApp = request.IsDspInApp;
+            user.IsDspBanner = request.IsDspBanner;
 
             await _dbContext.SaveChangesAsync();
 
-            return new UpdateFlagsResponse { Id = user.Id, Flag1 = user.IsDsp, Flag2 = user.IsDspInApp, Flag3 = user.IsDspBanner };
+            return new UpdateFlagsResponse { Id = user.Id, IsDsp = user.IsDsp, IsDspInApp = user.IsDspInApp, IsDspBanner = user.IsDspBanner };
         }
 
         public async Task<bool> UpdateStatistic(UpdateStatisticRequest request)
@@ -361,9 +361,9 @@ namespace XInstallBotProfile.Service.AdminPanelService
             // Обновляем флаги, если передан запрос на их изменение
             if (request.FlagsRequest != null)
             {
-                user.IsDsp = request.FlagsRequest.Flag1;
-                user.IsDspInApp = request.FlagsRequest.Flag2;
-                user.IsDspBanner = request.FlagsRequest.Flag3;
+                user.IsDsp = request.FlagsRequest.IsDsp;
+                user.IsDspInApp = request.FlagsRequest.IsDspInApp;
+                user.IsDspBanner = request.FlagsRequest.IsDspBanner;
             }
 
             // Сохраняем только если были изменения
@@ -412,9 +412,9 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 return true;
             }
             if (flagsRequest != null &&
-                (user.IsDsp != flagsRequest.Flag1 ||
-                 user.IsDspInApp != flagsRequest.Flag2 ||
-                 user.IsDspBanner != flagsRequest.Flag3))
+                (user.IsDsp != flagsRequest.IsDsp ||
+                 user.IsDspInApp != flagsRequest.IsDspInApp ||
+                 user.IsDspBanner != flagsRequest.IsDspBanner))
             {
                 return true;
             }

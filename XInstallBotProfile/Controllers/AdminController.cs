@@ -31,8 +31,7 @@ namespace XInstallBotProfile.Controllers
         [HttpPut("user/{id}/flags")]
         public async Task<IActionResult> UpdateUserFlags(int id, [FromBody] UpdateFlagsRequest request)
         {
-            request.Id = id; // Устанавливаем ID из маршрута
-            var result = await _userService.UpdateUserFlags(request);
+            var result = await _userService.UpdateUserFlags(id, request);
             return Ok(result);
         }
 
