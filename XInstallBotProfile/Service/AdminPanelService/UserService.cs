@@ -370,24 +370,28 @@ namespace XInstallBotProfile.Service.AdminPanelService
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<bool> SaveUserAsync(XInstallBotProfile.Models.User user)
+        public void SaveUserAsync(CreateUserRequest request)
         {
-            try
-            {
-                // Добавляем пользователя в базу данных
-                await _dbContext.Users.AddAsync(user);
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);  // Для безопасности храните хэш пароля
 
-                // Сохраняем изменения в базе данных
-                await _dbContext.SaveChangesAsync();
+            // Получаем максимальный userId из базы данных и инкрементируем его для нового пользователя
+            var userId = _dbContext.Users.Max(u => (int?)u.Id) ?? 0 + 1;  // Если пользователей нет, начнем с 1
 
-                return true;
-            }
-            catch (Exception ex)
+            var role = "User";  // Пример роли, можно сделать динамическим
+
+            // Генерация JWT токена с userId и ролью
+            var jwtToken = TokenGenerator.GenerateAccessToken(request.Login, userId, role);
+
+            var user = new XInstallBotProfile.Models.User
             {
-                // Логируем ошибку или обрабатываем исключения
-                Console.WriteLine($"Ошибка при сохранении пользователя: {ex.Message}");
-                return false;
-            }
+                Login = request.Login,
+                PasswordHash = passwordHash,
+                JwtToken = jwtToken,
+                IsDsp = true
+            };
+
+            _dbContext.Users.Add(user);
+            _dbContext.SaveChanges();
         }
 
         private async Task<XInstallBotProfile.Models.User> GetUserByIdAsync(int id)
