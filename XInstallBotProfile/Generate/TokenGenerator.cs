@@ -17,7 +17,7 @@ namespace XInstallBotProfile.Generate
                 throw new InvalidOperationException("Secret key is not configured.");
             }
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()), // ID пользователя
