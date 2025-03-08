@@ -1,8 +1,7 @@
-﻿namespace XInstallBotProfile.Models
+﻿namespace XInstallBotProfile.Service.AdminPanelService.Models.Request
 {
-    public class UserStatistic
+    public class CreateUserRecordRequest
     {
-        public int UserId { get; set; }
         public long Id { get; set; }
         public DateTime Date { get; set; }
         public long Total { get; set; }
@@ -15,10 +14,6 @@
         public long StartsCount { get; set; }
         public long CompletesCount { get; set; }
         public long Vtr { get; set; }
-
-        // Внешний ключ для связи с StatisticType
-        public int StatisticTypeId { get; set; }
-        public StatisticType StatisticType { get; set; }  // Навигационное свойство
+        public int TypeId { get; set; }
     }
-
 }

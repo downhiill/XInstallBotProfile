@@ -38,7 +38,13 @@ namespace XInstallBotProfile.Service.Bot
                         var login = CredentialGenerator.GenerateLogin();
                         var password = CredentialGenerator.GeneratePassword();
                         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
-                        var jwtToken = TokenGenerator.GenerateAccessToken(login);
+
+                        // Получаем максимальный userId из базы данных и инкрементируем его для нового пользователя
+                        var userId = await _context.Users.MaxAsync(u => (int?)u.Id) ?? 0 + 1; // Если пользователей нет, начнем с 1
+
+                        var role = "User";  // Пример роли, можно сделать динамическим
+
+                        var jwtToken = TokenGenerator.GenerateAccessToken(login, userId, role);
 
                         var newUser = new Models.User
                         {

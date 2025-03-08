@@ -10,7 +10,7 @@ namespace XInstallBotProfile.Generate
     {
         private static string _secretKey = "s2hG93b0qy32xvwp1PqX0M1aO9lmU4cT";
 
-        public static string GenerateAccessToken(string username)
+        public static string GenerateAccessToken(string username, int userId, string role)
         {
             if (string.IsNullOrEmpty(_secretKey))
             {
@@ -19,7 +19,9 @@ namespace XInstallBotProfile.Generate
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, username)
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()), // ID пользователя
+                new Claim(ClaimTypes.Role, role) // Роль пользователя
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
@@ -43,7 +45,7 @@ namespace XInstallBotProfile.Generate
             {
                 rng.GetBytes(randomBytes);
             }
-            return Convert.ToBase64String(randomBytes); // Длинная случайная строка
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

@@ -51,6 +51,14 @@ namespace XInstallBotProfile.Controllers
             var result = await _userService.UpdateUsername(id, request);
             return Ok(result);
         }
+        [HttpPatch("statistic/{id}")]
+        public async Task<IActionResult> UpdateStatistic(UpdateStatisticRequest request)
+        {
+            var result = await _userService.UpdateStatistic(request);
+            return Ok(result);
+           
+        }
+
 
         // 6. Общий API для сохранения всех изменений пользователя (ник и флаги)
         [HttpPut("user/save")]
@@ -88,6 +96,13 @@ namespace XInstallBotProfile.Controllers
             }
         }
 
+        [HttpPost("createUserRecord")]
+        public async Task<IActionResult> CreateUserRecord([FromBody] CreateUserRecordRequest request)
+        {
+            await _userService.CreateUserRecord(request);
+            return Ok("Запись создана");
+        }
+
         [HttpPost("saveUserData")]
         public async Task<IActionResult> SaveUserData([FromBody] User user)
         {
@@ -111,6 +126,20 @@ namespace XInstallBotProfile.Controllers
             try
             {
                 await _userService.DeleteUser(userIds);
+                return Ok(new { message = "Пользователи успешно удалены!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("deleteUserRecord")]
+        public async Task<IActionResult> DeleteUserRecord([FromBody] long id)
+        {
+            try
+            {
+                await _userService.DeleteUserRecord(id);
                 return Ok(new { message = "Пользователи успешно удалены!" });
             }
             catch (Exception ex)

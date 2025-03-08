@@ -15,7 +15,14 @@ namespace XInstallBotProfile.Service.Bot
         public void RegisterUser(string login, string password)
         {
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);  // Для безопасности храните хэш пароля
-            var jwtToken = TokenGenerator.GenerateAccessToken(login);
+
+            // Получаем максимальный userId из базы данных и инкрементируем его для нового пользователя
+            var userId = _context.Users.Max(u => (int?)u.Id) ?? 0 + 1;  // Если пользователей нет, начнем с 1
+
+            var role = "User";  // Пример роли, можно сделать динамическим
+
+            // Генерация JWT токена с userId и ролью
+            var jwtToken = TokenGenerator.GenerateAccessToken(login, userId, role);
 
             var user = new Models.User
             {
@@ -29,5 +36,6 @@ namespace XInstallBotProfile.Service.Bot
             _context.SaveChanges();
         }
     }
+
 
 }

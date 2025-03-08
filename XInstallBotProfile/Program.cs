@@ -51,6 +51,8 @@ builder.Services.AddSwaggerGen(c =>
 // Add background task
 builder.Services.AddHostedService<BotStartupService>();
 
+builder.Services.AddHttpContextAccessor();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline

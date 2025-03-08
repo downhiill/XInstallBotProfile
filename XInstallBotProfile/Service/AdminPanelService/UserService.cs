@@ -1,7 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Security.Claims;
 using Telegram.Bot.Requests.Abstractions;
+using Telegram.Bot.Types;
 using XInstallBotProfile.Context;
 using XInstallBotProfile.Controllers;
+using XInstallBotProfile.Exepction;
 using XInstallBotProfile.Models;
 using XInstallBotProfile.Service.AdminPanelService.Models.Request;
 using XInstallBotProfile.Service.AdminPanelService.Models.Response;
@@ -11,10 +15,12 @@ namespace XInstallBotProfile.Service.AdminPanelService
     public class UserService : IUserService
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(ApplicationDbContext dbContext)
+        public UserService(ApplicationDbContext dbContext, IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = dbContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<GetAllUsersResponse> GetAllUsers()
@@ -34,6 +40,60 @@ namespace XInstallBotProfile.Service.AdminPanelService
                     .ToListAsync()
             };
         }
+        public async Task<GetStatisticResponse> GetStatistic(GetStatisticRequest request)
+        {
+            var currentUserId = GetCurrentUserId();
+            var currentUserRole = GetCurrentUserRole();
+
+            if (currentUserId == 0)
+            {
+                throw new UnauthorizedAccessException("Необходима авторизация для выполнения запроса.");
+            }
+
+            if (currentUserRole != "Admin" && request.UserId != currentUserId)
+            {
+                // Если пользователь не администратор и пытается запросить чужую информацию
+                throw new ForbiddenAccessException("У вас нет прав для запроса этой информации.");
+            }
+
+            var statisticsQuery = _dbContext.UserStatistics
+                .Where(us => us.UserId == request.UserId)
+                .Where(us => us.StatisticType.Id == request.TypeId)
+                .Where(us => us.Date >= request.StartDate && us.Date <= request.EndDate);
+
+            var statistics = await statisticsQuery.ToListAsync();
+
+            var statisticTotal = new StatisticTotal
+            {
+                Total = statistics.Sum(us => us.Total),
+                TotalAck = statistics.Sum(us => us.Ack),
+                TotalWin = statistics.Sum(us => us.Win),
+                TotalImpsCount = statistics.Sum(us => us.ImpsCount),
+                TotalClicksCount = statistics.Sum(us => us.ClicksCount),
+                TotalStartsCount = statistics.Sum(us => us.StartsCount),
+                TotalCompletesCount = statistics.Sum(us => us.CompletesCount),
+            };
+
+            // Рассчитываем средние показатели
+            var statisticAverages = new StatisticAverages
+            {
+                AverageTotal = statistics.Average(us => us.Total),
+                AverageAck = statistics.Average(us => us.Ack),
+                AverageWin = statistics.Average(us => us.Win),
+                AverageImpsCount = statistics.Average(us => us.ImpsCount),
+                AverageClicksCount = statistics.Average(us => us.ClicksCount),
+                AverageStartsCount = statistics.Average(us => us.StartsCount),
+                AverageCompletesCount = statistics.Average(us => us.CompletesCount),
+            };
+
+            return new GetStatisticResponse
+            {
+                UserStatistics = statistics,
+                Total = statisticTotal,
+                Averages = statisticAverages // Добавляем средние показатели в ответ
+            };
+        }
+
 
         public async Task<CreateUserResponse> CreateUser(CreateUserRequest request)
         {
@@ -56,11 +116,12 @@ namespace XInstallBotProfile.Service.AdminPanelService
             var panelTypeIds = new List<int> { 1, 2, 3 };
 
             // Создаем пользователя
-            var user = new User
+            var user = new XInstallBotProfile.Models.User
             {
                 Nickname = request.Username,
                 CreatedAt = DateTime.UtcNow,
                 Login = login,
+                Role = "User",
                 PasswordHash = passwordHash,
                 IsDsp = true,
                 IsDspInApp = false,
@@ -80,6 +141,25 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 Login = user.Login,
                 PanelTypes = panelTypeIds
             };
+        }
+
+        public async Task<bool> CreateUserRecord (CreateUserRecordRequest request)
+        {
+            var recordUser = new UserStatistic
+            {
+                Date = DateTime.UtcNow,
+                Total = request.Total,
+                Ack = request.Ack,
+                Win = request.Win,
+                ImpsCount = request.ImpsCount,
+                ClicksCount = request.ClicksCount,
+                StartsCount = request.StartsCount,
+                CompletesCount = request.CompletesCount
+            };
+            _dbContext.UserStatistics.Add(recordUser);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<UpdateUsernameResponse> UpdateUsername(int id, UpdateUsernameRequest request)
@@ -112,6 +192,64 @@ namespace XInstallBotProfile.Service.AdminPanelService
             return new UpdateFlagsResponse { Id = user.Id, Flag1 = user.IsDsp, Flag2 = user.IsDspInApp, Flag3 = user.IsDspBanner };
         }
 
+        public async Task<bool> UpdateStatistic(UpdateStatisticRequest request)
+        {
+            // Находим статистику по ID
+            var statistic = await _dbContext.UserStatistics
+                .FirstOrDefaultAsync(us => us.Id == request.Id);
+
+            if (statistic == null)
+            {
+                // Возвращаем false, если статистика не найдена
+                return false;
+            }
+
+            // В зависимости от ключа, обновляем нужное поле
+            switch (request.Key.ToLower())
+            {
+                case "total":
+                    statistic.Total = request.Value;
+                    break;
+                case "ack":
+                    statistic.Ack = request.Value;
+                    break;
+                case "win":
+                    statistic.Win = request.Value;
+                    break;
+                case "impscount":
+                    statistic.ImpsCount = request.Value;
+                    break;
+                case "showrate":
+                    statistic.ShowRate = Convert.ToDecimal(request.Value);
+                    break;
+                case "clickscount":
+                    statistic.ClicksCount = request.Value;
+                    break;
+                case "ctr":
+                    statistic.Ctr = request.Value;
+                    break;
+                case "startscount":
+                    statistic.StartsCount = request.Value;
+                    break;
+                case "completescount":
+                    statistic.CompletesCount = request.Value;
+                    break;
+                case "vtr":
+                    statistic.Vtr = request.Value;
+                    break;
+                default:
+                    // Возвращаем false, если ключ некорректен
+                    return false;
+            }
+
+            // Сохраняем изменения в базе данных
+            await _dbContext.SaveChangesAsync();
+
+            // Возвращаем true, если операция прошла успешно
+            return true;
+        }
+
+
         public async Task DeleteUser(List<int> userIds)
         {
             if (userIds == null || userIds.Count == 0)
@@ -129,6 +267,28 @@ namespace XInstallBotProfile.Service.AdminPanelService
             _dbContext.Users.RemoveRange(users);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<bool> DeleteUserRecord(long id)
+        {
+            // Находим запись по ID
+            var recordUser = await _dbContext.UserStatistics
+                .FirstOrDefaultAsync(us => us.Id == id);
+
+            // Если запись не найдена, возвращаем false
+            if (recordUser == null)
+            {
+                return false;
+            }
+
+            // Удаляем запись
+            _dbContext.UserStatistics.Remove(recordUser);
+
+            // Сохраняем изменения в базе данных
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
 
         public async Task SaveUserChanges(SaveUserRequest request)
         {
@@ -163,7 +323,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<int> SaveUserAsync(User user)
+        public async Task<int> SaveUserAsync(XInstallBotProfile.Models.User user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user), "Пользователь не может быть null");
@@ -197,6 +357,17 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 return true;
             }
             return false;
+        }
+
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userIdClaim, out var userId) ? userId : 0;
+        }
+
+        private string GetCurrentUserRole()
+        {
+            return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
         }
 
     }

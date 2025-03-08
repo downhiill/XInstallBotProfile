@@ -36,38 +36,33 @@ namespace XInstallBotProfile.Controllers
                 return Unauthorized("Неверный логин или пароль.");
             }
 
-            // Если у пользователя нет refresh token, генерируем новый
-            if (string.IsNullOrEmpty(user.JwtToken))
-            {
-                var newRefreshToken = TokenGenerator.GenerateRefreshToken();
-                user.JwtToken = newRefreshToken; // Сохраняем новый refresh token
-            }
+            // Генерация нового access токена с UserId и Role
+            var newAccessToken = TokenGenerator.GenerateAccessToken(user.Login, user.Id, user.Role);
 
-            // Генерация нового access токена
-            var newAccessToken = TokenGenerator.GenerateAccessToken(user.Login);
-
-            // Генерация нового refresh токена (если нужно обновить)
+            // Генерация нового refresh токена
             var newRefreshTokenToUpdate = TokenGenerator.GenerateRefreshToken();
 
-            // Обновляем refresh токен в базе данных (если требуется)
+            // Обновляем refresh токен в базе данных
             user.JwtToken = newRefreshTokenToUpdate;
 
-            // Сохраняем изменения в базе данных
+            // Сохраняем изменения в БД
             await _context.SaveChangesAsync();
 
             // Устанавливаем refresh token в HttpOnly cookie
             Response.Cookies.Append("refreshToken", newRefreshTokenToUpdate, new CookieOptions
             {
-                HttpOnly = true,   // Запрещает доступ к cookie через JavaScript
-                Secure = true,     // Cookie будет отправляться только по HTTPS
-                SameSite = SameSiteMode.Strict, // Защищает от межсайтовых запросов
-                Expires = DateTime.UtcNow.AddDays(7) // Устанавливаем срок действия cookie (например, 7 дней)
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7)
             });
 
-            // Возвращаем access token в ответе
+            // Возвращаем access token + id + роль в ответе
             return Ok(new
             {
-                AccessToken = newAccessToken
+                AccessToken = newAccessToken,
+                UserId = user.Id,  // <-- Добавили UserId в ответ
+                Role = user.Role    // <-- Добавили Role в ответ
             });
         }
 
@@ -142,7 +137,7 @@ namespace XInstallBotProfile.Controllers
             }
 
             // Генерируем новые токены
-            var newAccessToken = TokenGenerator.GenerateAccessToken(user.Login);
+            var newAccessToken = TokenGenerator.GenerateAccessToken(user.Login, user.Id, user.Role);
             var newRefreshToken = TokenGenerator.GenerateRefreshToken();
 
             // Обновляем refresh-токен в БД
