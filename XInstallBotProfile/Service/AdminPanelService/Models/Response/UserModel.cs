@@ -7,6 +7,8 @@
         public DateTime CreatedAt { get; set; }
         public string Login { get; set; } // Логин
         public string PasswordHash { get; set; } // Пароль (в хэшированном виде)
-        public List<int> PanelTypes { get; set; } // Список доступных типов статистики (ID)
+        public bool IsDsp { get; set; } = true;
+        public bool IsDspInApp { get; set; } = false;
+        public bool IsDspBanner { get; set; } = false;
     }
 }

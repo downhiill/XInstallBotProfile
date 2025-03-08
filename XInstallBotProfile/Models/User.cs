@@ -17,9 +17,6 @@
         public bool IsDspInApp { get; set; } = false;
         public bool IsDspBanner { get; set; } = false;
 
-        // Связь с типами панелей
-        public ICollection<StatisticType> StatisticTypes { get; set; } // Коллекция типов панелей, доступных пользователю
-
     }
 
 }

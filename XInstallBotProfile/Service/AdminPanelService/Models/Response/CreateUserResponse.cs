@@ -7,5 +7,9 @@
         public DateTime CreatedAt { get; set; }
         public string Login { get; set; }
         public List<int> PanelTypes { get; set; } // Изменено на List<int> для возвращения идентификаторов типов панелей
+
+        public bool IsDsp;
+        public bool IsDspInApp;
+        public bool IsDspBanner;
     }
 }

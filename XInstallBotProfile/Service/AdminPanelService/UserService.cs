@@ -39,7 +39,9 @@ namespace XInstallBotProfile.Service.AdminPanelService
                         CreatedAt = u.CreatedAt,
                         Login = u.Login, // Логин
                         PasswordHash = u.PasswordHash, // Хэш пароля
-                        PanelTypes = u.StatisticTypes.Select(p => p.Id).ToList() // Список доступных типов статистики (ID)
+                        IsDsp = u.IsDsp,
+                        IsDspInApp = u.IsDspInApp,
+                        IsDspBanner = u.IsDspBanner
                     })
                     .ToListAsync()
 
@@ -158,8 +160,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
             var login = request.Username;
             var password = "GeneratedPassword123";
 
-            // Только ID-шники панелей
-            var panelTypeIds = new List<int> { 1, 2, 3 };
 
             // Создаем пользователя
             var user = new XInstallBotProfile.Models.User
@@ -171,7 +171,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 IsDsp = true,
                 IsDspInApp = false,
                 IsDspBanner = false,
-                StatisticTypes = panelTypeIds.Select(id => new StatisticType { Id = id }).ToList()
             };
 
             _dbContext.Users.Add(user);
@@ -184,7 +183,10 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 Username = user.Nickname,
                 CreatedAt = user.CreatedAt,
                 Login = user.Login,
-                PanelTypes = panelTypeIds
+                IsDsp = user.IsDsp,
+                IsDspInApp = user.IsDspInApp,
+                IsDspBanner = user.IsDspBanner
+                
             };
         }
 
