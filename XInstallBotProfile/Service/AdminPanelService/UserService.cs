@@ -29,19 +29,19 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
             return new GetAllUsersResponse
             {
-                //UserResponse = await _dbContext.Users
-                //    .Select(u => new UserModel
-                //    {
-                //        Id = u.Id,
-                //        Username = u.Nickname,
-                //        CreatedAt = u.CreatedAt,
-                //        Login = u.Login, // Логин
-                //        PasswordHash = u.PasswordHash, // Хэш пароля
-                //        PanelTypes = u.StatisticTypes.Select(p => p.Id).ToList() // Список доступных типов статистики (ID)
-                //    })
-                //    .ToListAsync()
+                UserResponse = await _dbContext.Users
+                    .Select(u => new UserModel
+                    {
+                        Id = u.Id,
+                        Username = u.Nickname,
+                        CreatedAt = u.CreatedAt,
+                        Login = u.Login, // Логин
+                        PasswordHash = u.PasswordHash, // Хэш пароля
+                        PanelTypes = u.StatisticTypes.Select(p => p.Id).ToList() // Список доступных типов статистики (ID)
+                    })
+                    .ToListAsync()
 
-                
+
             };
         }
         public async Task<GetStatisticResponse> GetStatistic(GetStatisticRequest request)
