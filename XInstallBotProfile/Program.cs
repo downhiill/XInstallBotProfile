@@ -7,6 +7,8 @@ using Microsoft.OpenApi.Models;
 using XInstallBotProfile.Service.Bot;
 using XInstallBotProfile.Service.AdminPanelService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,7 +57,20 @@ builder.Services.AddHostedService<BotStartupService>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer();
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false; // Включите это, если работаете в режиме без HTTPS, для продакшн — используйте HTTPS
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidIssuer = "yourIssuer",  // Замените на значение, которое использовалось при создании токена
+            ValidAudience = "yourAudience",  // Замените на значение, которое использовалось при создании токена
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("s2hG93b0qy32xvwp1PqX0M1aO9lmU4cT"))  // Замените на ваш секретный ключ
+        };
+    });
 
 builder.Services.AddAuthorization(options =>
 {
