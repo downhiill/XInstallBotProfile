@@ -7,7 +7,7 @@ using XInstallBotProfile.Service.AdminPanelService.Models.Request;
 
 namespace XInstallBotProfile.Controllers
 {
-    /*[Authorize(Roles = "Admin")]*/  // Это обеспечит доступ только для пользователей с ролью "Admin"
+     // Это обеспечит доступ только для пользователей с ролью "Admin"
     [ApiController]
     [Route("api/admin")]
     public class AdminController : ControllerBase
@@ -18,8 +18,8 @@ namespace XInstallBotProfile.Controllers
         {
             _userService = userService;
         }
-
         // 1. Получение списка пользователей
+        [Authorize(Roles = "Admin")]
         [HttpGet("users")]
         public async Task<IActionResult> GetUsers()
         {
