@@ -15,10 +15,6 @@
         public long StartsCount { get; set; }
         public long CompletesCount { get; set; }
         public long Vtr { get; set; }
-
-        // Внешний ключ для связи с StatisticType
-        public int StatisticTypeId { get; set; }
-        public StatisticType StatisticType { get; set; }  // Навигационное свойство
     }
 
 }

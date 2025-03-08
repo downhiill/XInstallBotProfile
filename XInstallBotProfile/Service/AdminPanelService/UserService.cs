@@ -107,7 +107,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
             var statisticsQuery = _dbContext.UserStatistics
                 .Where(us => us.UserId == request.UserId)
-                .Where(us => us.StatisticType.Id == request.TypeId)
+
                 .Where(us => us.Date >= request.StartDate && us.Date <= request.EndDate);
 
             var statistics = await statisticsQuery.ToListAsync();
@@ -370,31 +370,24 @@ namespace XInstallBotProfile.Service.AdminPanelService
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<bool> SaveUserAsync(CreateUserRequest request)
+        public async Task<bool> SaveUserAsync(XInstallBotProfile.Models.User user)
         {
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);  // Для безопасности храните хэш пароля
-
-            // Получаем максимальный userId из базы данных и инкрементируем его для нового пользователя
-            var userId = _dbContext.Users.Max(u => (int?)u.Id) ?? 0 + 1;  // Если пользователей нет, начнем с 1
-
-            var role = "User";  // Пример роли, можно сделать динамическим
-
-            // Генерация JWT токена с userId и ролью
-            var jwtToken = TokenGenerator.GenerateAccessToken(request.Login, request.UserId, role);
-
-            var user = new XInstallBotProfile.Models.User
+            try
             {
-                Login = request.Login,
-                PasswordHash = passwordHash,
-                Nickname = request.Username,
-                JwtToken = jwtToken,
-                IsDsp = true
-            };
+                // Добавляем пользователя в базу данных
+                await _dbContext.Users.AddAsync(user);
 
-            _dbContext.Users.Add(user);
-            _dbContext.SaveChanges(); // Возвращаем ID сохраненного пользователя
+                // Сохраняем изменения в базе данных
+                await _dbContext.SaveChangesAsync();
 
-            return true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Логируем ошибку или обрабатываем исключения
+                Console.WriteLine($"Ошибка при сохранении пользователя: {ex.Message}");
+                return false;
+            }
         }
 
         private async Task<XInstallBotProfile.Models.User> GetUserByIdAsync(int id)
