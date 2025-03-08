@@ -67,10 +67,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
                     Nickname = userName
                 };
 
-                // Добавляем пользователя в базу данных
-                _dbContext.Users.Add(user);
-                await _dbContext.SaveChangesAsync(); // Сохраняем изменения
-
                 return new GenerateUserResponse
                 {
                     Id = user.Id,
@@ -80,6 +76,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 };
             
         }
+
 
         private string HashPassword(string password)
         {
@@ -158,7 +155,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
             // Генерируем логин и пароль
             var login = request.Username;
             var password = "GeneratedPassword123";
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
             // Только ID-шники панелей
             var panelTypeIds = new List<int> { 1, 2, 3 };
@@ -170,7 +166,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 CreatedAt = DateTime.UtcNow,
                 Login = login,
                 Role = "User",
-                PasswordHash = passwordHash,
                 IsDsp = true,
                 IsDspInApp = false,
                 IsDspBanner = false,
