@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Security.Claims;
 using Telegram.Bot.Requests.Abstractions;
@@ -6,6 +7,7 @@ using Telegram.Bot.Types;
 using XInstallBotProfile.Context;
 using XInstallBotProfile.Controllers;
 using XInstallBotProfile.Exepction;
+using XInstallBotProfile.Generate;
 using XInstallBotProfile.Models;
 using XInstallBotProfile.Service.AdminPanelService.Models.Request;
 using XInstallBotProfile.Service.AdminPanelService.Models.Response;
@@ -366,14 +368,30 @@ namespace XInstallBotProfile.Service.AdminPanelService
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<int> SaveUserAsync(XInstallBotProfile.Models.User user)
+        public async Task<bool> SaveUserAsync( CreateUserRequest request)
         {
-            if (user == null)
-                throw new ArgumentNullException(nameof(user), "Пользователь не может быть null");
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);  // Для безопасности храните хэш пароля
+
+            // Получаем максимальный userId из базы данных и инкрементируем его для нового пользователя
+            var userId = _dbContext.Users.Max(u => (int?)u.Id) ?? 0 + 1;  // Если пользователей нет, начнем с 1
+
+            var role = "User";  // Пример роли, можно сделать динамическим
+
+            // Генерация JWT токена с userId и ролью
+            var jwtToken = TokenGenerator.GenerateAccessToken(request.Login, request.UserId, role);
+
+            var user = new XInstallBotProfile.Models.User
+            {
+                Login = request.Login,
+                PasswordHash = passwordHash,
+                JwtToken = jwtToken,
+                IsDsp = true
+            };
 
             _dbContext.Users.Add(user);
-            await _dbContext.SaveChangesAsync();
-            return user.Id; // Возвращаем ID сохраненного пользователя
+            _dbContext.SaveChanges(); // Возвращаем ID сохраненного пользователя
+
+            return true;
         }
 
         private async Task<XInstallBotProfile.Models.User> GetUserByIdAsync(int id)

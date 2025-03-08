@@ -83,14 +83,14 @@ namespace XInstallBotProfile.Controllers
         }
 
         [HttpPost("saveUserData")]
-        public async Task<IActionResult> SaveUserData([FromBody] User user)
+        public async Task<IActionResult> SaveUserData([FromBody] CreateUserRequest request)
         {
-            if (user == null)
+            if (request == null)
                 return BadRequest("Некорректные данные пользователя.");
 
             try
             {
-                int userId = await _userService.SaveUserAsync(user);
+                var userId = await _userService.SaveUserAsync(request);
                 return Ok(new { message = "Пользователь успешно сохранен!", userId });
             }
             catch (Exception ex)
