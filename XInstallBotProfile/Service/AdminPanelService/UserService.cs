@@ -386,6 +386,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             {
                 Login = request.Login,
                 PasswordHash = passwordHash,
+                Nickname = request.Username,
                 JwtToken = jwtToken,
                 IsDsp = true
             };
