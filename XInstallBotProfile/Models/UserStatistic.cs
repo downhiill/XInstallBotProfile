@@ -1,4 +1,6 @@
-﻿namespace XInstallBotProfile.Models
+﻿using XInstallBotProfile.Service.AdminPanelService.Models.Request;
+
+namespace XInstallBotProfile.Models
 {
     public class UserStatistic
     {
@@ -15,7 +17,8 @@
         public long StartsCount { get; set; }
         public long CompletesCount { get; set; }
         public long Vtr { get; set; }
-        public bool Banner { get; set; }
+
+        public List<FlagInfo> FlagStatus { get; set; }
     }
 
 }
