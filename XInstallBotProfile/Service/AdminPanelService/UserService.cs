@@ -71,7 +71,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 {
                     Id = user.Id,
                     Login = user.Login,
-                    Password = user.PasswordHash,
+                    Password = userPassword,
                     Nickname = user.Nickname
                 };
             
