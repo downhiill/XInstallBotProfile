@@ -45,10 +45,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
             };
         }
 
-        public async Task<bool> GenerateUser()
+        public async Task<GenerateUserResponse> GenerateUser()
         {
-            try
-            {
                 // Получаем максимальный ID из базы данных
                 var maxUserId = await _dbContext.Users.MaxAsync(u => (int?)u.Id) ?? 0;
 
@@ -73,14 +71,14 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 _dbContext.Users.Add(user);
                 await _dbContext.SaveChangesAsync(); // Сохраняем изменения
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                // Логируем ошибку или обрабатываем исключения
-                Console.WriteLine($"Ошибка: {ex.Message}");
-                return false;
-            }
+                return new GenerateUserResponse
+                {
+                    Id = user.Id,
+                    Login = user.Login,
+                    Password = user.PasswordHash,
+                    Nickname = user.Nickname
+                };
+            
         }
 
         private string HashPassword(string password)

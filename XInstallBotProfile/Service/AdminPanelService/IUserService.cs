@@ -19,6 +19,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
         public Task<bool> UpdateStatistic(UpdateStatisticRequest request);
 
-        public Task<bool> GenerateUser();
+        public Task<GenerateUserResponse> GenerateUser();
     }
 }
