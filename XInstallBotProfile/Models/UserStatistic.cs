@@ -15,6 +15,7 @@
         public long StartsCount { get; set; }
         public long CompletesCount { get; set; }
         public long Vtr { get; set; }
+        public bool Banner { get; set; }
     }
 
 }

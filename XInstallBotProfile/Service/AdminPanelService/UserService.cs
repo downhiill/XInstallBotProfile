@@ -107,7 +107,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
             var statisticsQuery = _dbContext.UserStatistics
                 .Where(us => us.UserId == request.UserId)
-
+                .Where(us => us.Banner == request.Banner) 
                 .Where(us => us.Date >= request.StartDate && us.Date <= request.EndDate);
 
             var statistics = await statisticsQuery.ToListAsync();
