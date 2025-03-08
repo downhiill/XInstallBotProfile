@@ -69,31 +69,10 @@ namespace XInstallBotProfile.Controllers
         }
 
         [HttpGet("generateUserData")]
-        public IActionResult GenerateUserData()
+        public async Task<IActionResult> GenerateUserData()
         {
-            try
-            {
-                // Генерируем случайные данные для пользователя
-                var userId = new Random().Next(1, 10000);  // Генерация случайного ID
-                var userLogin = "user" + userId;  // Генерация логина
-                var userPassword = "GeneratedPassword" + userId;  // Генерация пароля
-                var userName = "User" + userId;  // Генерация имени
-
-                // Возвращаем сгенерированные данные в ответе
-                var userData = new
-                {
-                    Id = userId,
-                    Login = userLogin,
-                    Password = userPassword,
-                    Name = userName
-                };
-
-                return Ok(userData);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Ошибка на сервере.");
-            }
+            var result = await _userService.GenerateUser();
+            return Ok(result);
         }
 
         [HttpPost("createUserRecord")]
