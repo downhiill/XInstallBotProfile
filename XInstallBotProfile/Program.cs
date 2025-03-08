@@ -6,6 +6,7 @@ using XInstallBotProfile.Context;
 using Microsoft.OpenApi.Models;
 using XInstallBotProfile.Service.Bot;
 using XInstallBotProfile.Service.AdminPanelService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,14 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddHostedService<BotStartupService>();
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
 
 var app = builder.Build();
 
