@@ -17,7 +17,7 @@ namespace XInstallBotProfile.Controllers
         }
 
         [HttpGet("statistic")]
-        public async Task<IActionResult> GetStatistic(GetStatisticRequest request)
+        public async Task<IActionResult> GetStatistic([FromQuery] GetStatisticRequest request)
         {
             try
             {
