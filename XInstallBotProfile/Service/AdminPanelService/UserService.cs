@@ -368,7 +368,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<bool> SaveUserAsync( CreateUserRequest request)
+        public async Task<bool> SaveUserAsync(CreateUserRequest request)
         {
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);  // Для безопасности храните хэш пароля
 
@@ -384,6 +384,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             {
                 Login = request.Login,
                 PasswordHash = passwordHash,
+                Nickname = request.Username,
                 JwtToken = jwtToken,
                 IsDsp = true
             };
