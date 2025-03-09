@@ -3,7 +3,10 @@
     public class GetStatisticRequest
     {
         public int UserId { get; set; }
-        public List<FlagInfo> FlagStatus { get; set; }  // Тип панели (DSP, DSP InApp, DSP Banner)
+        
+        public bool IsDsp { get; set; }
+        public bool IsDspInApp { get; set; }
+        public bool IsDspBanner { get; set; }
         public DateTime StartDate { get; set; }  // Дата начала
         public DateTime EndDate { get; set; }    // Дата окончания
     }
