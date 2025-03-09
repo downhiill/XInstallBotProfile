@@ -141,7 +141,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             {
                 UserStatistics = statistics,
                 Total = statisticTotal,
-                Averages = statisticAverages // Добавляем средние показатели в ответ
+                //Averages = statisticAverages // Добавляем средние показатели в ответ
             };
         }
 
