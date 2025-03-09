@@ -75,9 +75,9 @@ namespace XInstallBotProfile.Controllers
         }
 
         [HttpPost("createUserRecord")]
-        public async Task<IActionResult> CreateUserRecord([FromBody] CreateUserRecordRequest request)
+        public async Task<IActionResult> CreateUserRecord(int UserId, [FromBody] CreateUserRecordRequest request)
         {
-            await _userService.CreateUserRecord(request);
+            await _userService.CreateUserRecord(UserId, request);
             return Ok("Запись создана");
         }
 

@@ -191,10 +191,11 @@ namespace XInstallBotProfile.Service.AdminPanelService
             };
         }
 
-        public async Task<bool> CreateUserRecord (CreateUserRecordRequest request)
+        public async Task<bool> CreateUserRecord (int UserId,CreateUserRecordRequest request)
         {
             var recordUser = new UserStatistic
             {
+                UserId = UserId,
                 Date = DateTime.UtcNow,
                 Total = request.Total,
                 Ack = request.Ack,
@@ -202,7 +203,11 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 ImpsCount = request.ImpsCount,
                 ClicksCount = request.ClicksCount,
                 StartsCount = request.StartsCount,
-                CompletesCount = request.CompletesCount
+                CompletesCount = request.CompletesCount,
+                IsDsp = request.IsDsp,
+                IsDspInApp = request.IsDspInApp,
+                IsDspBanner = request.IsDspBanner,
+                
             };
             _dbContext.UserStatistics.Add(recordUser);
             await _dbContext.SaveChangesAsync();

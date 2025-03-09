@@ -14,6 +14,8 @@
         public long StartsCount { get; set; }
         public long CompletesCount { get; set; }
         public long Vtr { get; set; }
-        public int TypeId { get; set; }
+        public bool IsDsp { get; set; }
+        public bool IsDspInApp { get; set; }
+        public bool IsDspBanner { get; set; }
     }
 }
