@@ -7,5 +7,6 @@ namespace XInstallBotProfile.Service.AdminPanelService.Models.Response
         public List<UserStatistic> UserStatistics { get; set; }
         public StatisticTotal Total { get; set; }
         public StatisticAverages Averages { get; set; }
+        public long TotalAllTime { get; set; }
     }
 }

@@ -111,6 +111,14 @@ namespace XInstallBotProfile.Service.AdminPanelService
                  .Where(us => us.IsDspInApp == request.IsDspInApp)
                  .Where(us => us.IsDspBanner == request.IsDspBanner);
 
+            
+            var totalShowRate = await _dbContext.UserStatistics
+                .Where(us => us.UserId == request.UserId)
+                .Where(us => us.IsDsp == request.IsDsp)
+                .Where(us => us.IsDspInApp == request.IsDspInApp)
+                .Where(us => us.IsDspBanner == request.IsDspBanner)
+                .SumAsync(us => us.Total); // Сумма Total за всё время
+
             // Фильтрация по дате, если параметры заданы
             if (request.StartDate.HasValue)
             {
@@ -146,16 +154,20 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 Win = statistics.Any() ? statistics.Average(us => us.Win) : 0,
                 Ctr = statistics.Any() ? statistics.Average(us => us.Ctr) : 0,
                 Vtr = statistics.Any() ? statistics.Average(us => us.Vtr) : 0,
+                ShowRate = statistics.Any() ? statistics.Average(us => us.ShowRate) : 0,
                 ImpsCount = statistics.Any() ? statistics.Average(us => us.ImpsCount) : 0,
                 ClicksCount = statistics.Any() ? statistics.Average(us => us.ClicksCount) : 0,
                 StartsCount = statistics.Any() ? statistics.Average(us => us.StartsCount) : 0,
                 CompletesCount = statistics.Any() ? statistics.Average(us => us.CompletesCount) : 0,
             };
 
+            
+
             return new GetStatisticResponse
             {
                 UserStatistics = statistics,
                 Total = statisticTotal,
+                TotalAllTime = totalShowRate,
                 Averages = statisticAverages // Добавляем средние показатели в ответ
             };
         }

@@ -8,6 +8,7 @@
         public double ImpsCount { get; set; }
         public double ClicksCount { get; set; }
         public double StartsCount { get; set; }
+        public decimal ShowRate { get; set; }
         public double CompletesCount { get; set; }
         public decimal Ctr { get; set; }
         public decimal Vtr { get; set; }
