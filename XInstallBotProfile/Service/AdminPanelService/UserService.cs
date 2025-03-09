@@ -125,23 +125,22 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 TotalCompletesCount = statistics.Sum(us => us.CompletesCount),
             };
 
-            //// Рассчитываем средние показатели
-            //var statisticAverages = new StatisticAverages
-            //{
-            //    AverageTotal = statistics.Average(us => us.Total),
-            //    AverageAck = statistics.Average(us => us.Ack),
-            //    AverageWin = statistics.Average(us => us.Win),
-            //    AverageImpsCount = statistics.Average(us => us.ImpsCount),
-            //    AverageClicksCount = statistics.Average(us => us.ClicksCount),
-            //    AverageStartsCount = statistics.Average(us => us.StartsCount),
-            //    AverageCompletesCount = statistics.Average(us => us.CompletesCount),
-            //};
+            var statisticAverages = new StatisticAverages
+            {
+                AverageTotal = statistics.Any() ? statistics.Average(us => us.Total) : 0,
+                AverageAck = statistics.Any() ? statistics.Average(us => us.Ack) : 0,
+                AverageWin = statistics.Any() ? statistics.Average(us => us.Win) : 0,
+                AverageImpsCount = statistics.Any() ? statistics.Average(us => us.ImpsCount) : 0,
+                AverageClicksCount = statistics.Any() ? statistics.Average(us => us.ClicksCount) : 0,
+                AverageStartsCount = statistics.Any() ? statistics.Average(us => us.StartsCount) : 0,
+                AverageCompletesCount = statistics.Any() ? statistics.Average(us => us.CompletesCount) : 0,
+            };
 
             return new GetStatisticResponse
             {
                 UserStatistics = statistics,
                 Total = statisticTotal,
-                //Averages = statisticAverages // Добавляем средние показатели в ответ
+                Averages = statisticAverages // Добавляем средние показатели в ответ
             };
         }
 
