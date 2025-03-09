@@ -67,6 +67,9 @@ namespace XInstallBotProfile.Controllers
                     Login = user.Login,
                     Role = user.Role,
                     Nickname = user.Nickname,
+                    IsDsp = user.IsDsp,
+                    IsDspInApp = user.IsDspInApp,
+                    IsDspBanner = user.IsDspBanner
                 }
             });
         }
@@ -163,6 +166,9 @@ namespace XInstallBotProfile.Controllers
                     Login = user.Login,
                     Role = user.Role,
                     Nickname = user.Nickname,
+                    IsDsp = user.IsDsp,
+                    IsDspInApp = user.IsDspInApp,
+                    IsDspBanner = user.IsDspBanner
                 }
             });
         }
