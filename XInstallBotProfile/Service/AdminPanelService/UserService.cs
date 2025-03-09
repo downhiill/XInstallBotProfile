@@ -49,6 +49,40 @@ namespace XInstallBotProfile.Service.AdminPanelService
             };
         }
 
+        public async Task<GetUserByIdResponse> GetUserById(GetUserByIdRequest request)
+        {
+            // Проверка, что ID валидный
+            if (request.UserId <= 0)
+            {
+                throw new ArgumentException("Неверный ID пользователя.");
+            }
+
+            // Получаем пользователя из базы данных по ID
+            var user = await _dbContext.Users
+                .Where(u => u.Id == request.UserId)
+                .FirstOrDefaultAsync();
+
+            // Если пользователь не найден
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Пользователь не найден.");
+            }
+
+            // Создаем объект ответа
+            var response = new GetUserByIdResponse
+            {
+                UserId = user.Id,
+                UserName = user.Nickname,
+                IsDsp = user.IsDsp,
+                IsDspInApp = user.IsDspInApp,
+                IsDspBanner = user.IsDspBanner
+                // Дополнительно можно добавить другие поля, которые нужны в ответе
+            };
+
+            return response;
+        }
+
+
         public async Task<GenerateUserResponse> GenerateUser()
         {
                 // Получаем максимальный ID из базы данных

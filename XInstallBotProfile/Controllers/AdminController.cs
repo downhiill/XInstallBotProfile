@@ -58,6 +58,14 @@ namespace XInstallBotProfile.Controllers
            
         }
 
+        [HttpGet("user/{id}")]
+
+        public async Task<IActionResult> GetUserById([FromBody] GetUserByIdRequest request)
+        {
+            var result = await _userService.GetUserById(request);
+            return Ok(result);
+        }
+
 
         // 6. Общий API для сохранения всех изменений пользователя (ник и флаги)
         [HttpPut("user/save")]
