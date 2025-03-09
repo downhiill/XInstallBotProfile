@@ -7,7 +7,7 @@
         public bool IsDsp { get; set; }
         public bool IsDspInApp { get; set; }
         public bool IsDspBanner { get; set; }
-        public DateTime StartDate { get; set; }  // Дата начала
-        public DateTime EndDate { get; set; }    // Дата окончания
+        public DateTime? StartDate { get; set; }  // Дата начала
+        public DateTime? EndDate { get; set; }    // Дата окончания
     }
 }
