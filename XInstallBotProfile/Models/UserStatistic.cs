@@ -18,9 +18,9 @@ namespace XInstallBotProfile.Models
         public long CompletesCount { get; set; }
         public long Vtr { get; set; }
 
-       public bool IsDsp { get; set; }
-       public bool IsDspInApp { get; set; }
-       public bool IsDspBanner { get; set; }
+        public bool IsDsp { get; set; }
+        public bool IsDspInApp { get; set; }
+        public bool IsDspBanner { get; set; }
     }
 
 }
