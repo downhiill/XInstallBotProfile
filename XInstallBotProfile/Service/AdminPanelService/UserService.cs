@@ -106,13 +106,24 @@ namespace XInstallBotProfile.Service.AdminPanelService
             }
 
             var statisticsQuery = _dbContext.UserStatistics
-                .Where(us => us.UserId == request.UserId)
-                .Where(us => us.IsDsp == request.IsDsp)
-                .Where(us => us.IsDspInApp == request.IsDspInApp)
-                .Where(us => us.IsDspBanner == request.IsDspBanner)
-                .Where(us => us.Date >= request.StartDate && us.Date <= request.EndDate);
+                 .Where(us => us.UserId == request.UserId)
+                 .Where(us => us.IsDsp == request.IsDsp)
+                 .Where(us => us.IsDspInApp == request.IsDspInApp)
+                 .Where(us => us.IsDspBanner == request.IsDspBanner);
+
+            // Фильтрация по дате, если параметры заданы
+            if (request.StartDate.HasValue)
+            {
+                statisticsQuery = statisticsQuery.Where(us => us.Date >= request.StartDate.Value);
+            }
+
+            if (request.EndDate.HasValue)
+            {
+                statisticsQuery = statisticsQuery.Where(us => us.Date <= request.EndDate.Value);
+            }
 
             var statistics = await statisticsQuery.ToListAsync();
+
 
             var statisticTotal = new StatisticTotal
             {
