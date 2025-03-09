@@ -16,7 +16,7 @@ namespace XInstallBotProfile.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult RegisterUser()
+        public async Task<IActionResult> RegisterUser()
         {
             // Генерируем логин и пароль
             string login = CredentialGenerator.GenerateLogin();
