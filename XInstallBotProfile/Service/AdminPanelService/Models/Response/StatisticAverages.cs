@@ -2,12 +2,14 @@
 {
     public class StatisticAverages
     {
-        public double AverageTotal { get; set; }
-        public double AverageAck { get; set; }
-        public double AverageWin { get; set; }
-        public double AverageImpsCount { get; set; }
-        public double AverageClicksCount { get; set; }
-        public double AverageStartsCount { get; set; }
-        public double AverageCompletesCount { get; set; }
+        public double Total { get; set; }
+        public double Ack { get; set; }
+        public double Win { get; set; }
+        public double ImpsCount { get; set; }
+        public double ClicksCount { get; set; }
+        public double StartsCount { get; set; }
+        public double CompletesCount { get; set; }
+        public decimal Ctr { get; set; }
+        public decimal Vtr { get; set; }
     }
 }

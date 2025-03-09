@@ -147,10 +147,18 @@ namespace XInstallBotProfile.Controllers
                 Expires = DateTime.UtcNow.AddDays(7) // Срок жизни куки
             });
 
+            
+
             return Ok(new
             {
                 AccessToken = newAccessToken,
-                Role = user.Role,
+                User = new User
+                {
+                    Id = user.Id,
+                    Login = user.Login,
+                    Role = user.Role,
+                    Nickname = user.Nickname,
+                }
             });
         }
 

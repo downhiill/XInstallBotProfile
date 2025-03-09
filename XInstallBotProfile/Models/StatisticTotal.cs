@@ -3,11 +3,14 @@
     public class StatisticTotal
     {
         public long Total { get; set; }
-        public long TotalAck { get; set; }
-        public long TotalWin { get; set; }
-        public long TotalImpsCount { get; set; }
-        public long TotalClicksCount { get; set; }
-        public long TotalStartsCount { get; set; }
-        public long TotalCompletesCount { get; set; }
+        public long Ack { get; set; }
+        public long Win { get; set; }
+        public long ImpsCount { get; set; }
+        public long ClicksCount { get; set; }
+        public long StartsCount { get; set; }
+        public decimal ShowRate { get; set; }
+        public long CompletesCount { get; set; }
+        public decimal Ctr { get; set; }
+        public decimal Vtr { get; set; }
     }
 }

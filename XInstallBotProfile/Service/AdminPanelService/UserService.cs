@@ -128,23 +128,28 @@ namespace XInstallBotProfile.Service.AdminPanelService
             var statisticTotal = new StatisticTotal
             {
                 Total = statistics.Sum(us => us.Total),
-                TotalAck = statistics.Sum(us => us.Ack),
-                TotalWin = statistics.Sum(us => us.Win),
-                TotalImpsCount = statistics.Sum(us => us.ImpsCount),
-                TotalClicksCount = statistics.Sum(us => us.ClicksCount),
-                TotalStartsCount = statistics.Sum(us => us.StartsCount),
-                TotalCompletesCount = statistics.Sum(us => us.CompletesCount),
+                Ack = statistics.Sum(us => us.Ack),
+                Win = statistics.Sum(us => us.Win),
+                ImpsCount = statistics.Sum(us => us.ImpsCount),
+                ClicksCount = statistics.Sum(us => us.ClicksCount),
+                ShowRate = statistics.Sum(us => us.ShowRate),
+                Ctr = statistics.Sum(us => us.Ctr),
+                Vtr = statistics.Sum(us => us.Vtr),
+                StartsCount = statistics.Sum(us => us.StartsCount),
+                CompletesCount = statistics.Sum(us => us.CompletesCount),
             };
 
             var statisticAverages = new StatisticAverages
             {
-                AverageTotal = statistics.Any() ? statistics.Average(us => us.Total) : 0,
-                AverageAck = statistics.Any() ? statistics.Average(us => us.Ack) : 0,
-                AverageWin = statistics.Any() ? statistics.Average(us => us.Win) : 0,
-                AverageImpsCount = statistics.Any() ? statistics.Average(us => us.ImpsCount) : 0,
-                AverageClicksCount = statistics.Any() ? statistics.Average(us => us.ClicksCount) : 0,
-                AverageStartsCount = statistics.Any() ? statistics.Average(us => us.StartsCount) : 0,
-                AverageCompletesCount = statistics.Any() ? statistics.Average(us => us.CompletesCount) : 0,
+                Total = statistics.Any() ? statistics.Average(us => us.Total) : 0,
+                Ack = statistics.Any() ? statistics.Average(us => us.Ack) : 0,
+                Win = statistics.Any() ? statistics.Average(us => us.Win) : 0,
+                Ctr = statistics.Any() ? statistics.Average(us => us.Ctr) : 0,
+                Vtr = statistics.Any() ? statistics.Average(us => us.Vtr) : 0,
+                ImpsCount = statistics.Any() ? statistics.Average(us => us.ImpsCount) : 0,
+                ClicksCount = statistics.Any() ? statistics.Average(us => us.ClicksCount) : 0,
+                StartsCount = statistics.Any() ? statistics.Average(us => us.StartsCount) : 0,
+                CompletesCount = statistics.Any() ? statistics.Average(us => us.CompletesCount) : 0,
             };
 
             return new GetStatisticResponse
