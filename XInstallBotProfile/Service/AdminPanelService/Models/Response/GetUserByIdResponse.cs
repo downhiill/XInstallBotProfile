@@ -3,7 +3,7 @@
     public class GetUserByIdResponse
     {
         public int UserId { get; set; }
-        public string UserName { get; set; }
+        public string username { get; set; }
         public bool IsDsp { get; set; }
         public bool IsDspInApp { get; set; }
         public bool IsDspBanner { get; set; }

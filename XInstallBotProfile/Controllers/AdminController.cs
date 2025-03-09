@@ -60,9 +60,9 @@ namespace XInstallBotProfile.Controllers
 
         [HttpGet("user/{id}")]
 
-        public async Task<IActionResult> GetUserById([FromQuery] GetUserByIdRequest request)
+        public async Task<IActionResult> GetUserById(int id)
         {
-            var result = await _userService.GetUserById(request);
+            var result = await _userService.GetUserById(id);
             return Ok(result);
         }
 

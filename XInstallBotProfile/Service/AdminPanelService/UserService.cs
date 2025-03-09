@@ -49,17 +49,17 @@ namespace XInstallBotProfile.Service.AdminPanelService
             };
         }
 
-        public async Task<GetUserByIdResponse> GetUserById(GetUserByIdRequest request)
+        public async Task<GetUserByIdResponse> GetUserById(int id)
         {
             // Проверка, что ID валидный
-            if (request.UserId <= 0)
+            if (id <= 0)
             {
                 throw new ArgumentException("Неверный ID пользователя.");
             }
 
             // Получаем пользователя из базы данных по ID
             var user = await _dbContext.Users
-                .Where(u => u.Id == request.UserId)
+                .Where(u => u.Id == id)
                 .FirstOrDefaultAsync();
 
             // Если пользователь не найден
@@ -72,7 +72,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             var response = new GetUserByIdResponse
             {
                 UserId = user.Id,
-                UserName = user.Nickname,
+                username = user.Nickname,
                 IsDsp = user.IsDsp,
                 IsDspInApp = user.IsDspInApp,
                 IsDspBanner = user.IsDspBanner

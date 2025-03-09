@@ -7,7 +7,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
     public interface IUserService
     {
         public Task<GetAllUsersResponse> GetAllUsers();
-        public Task<GetUserByIdResponse> GetUserById(GetUserByIdRequest request);
+        public Task<GetUserByIdResponse> GetUserById(int id);
         public Task<CreateUserResponse> CreateUser(CreateUserRequest request);
         public Task<bool> CreateUserRecord(int UserId, CreateUserRecordRequest request);
         public Task<UpdateUsernameResponse> UpdateUsername(int id, UpdateUsernameRequest request);
