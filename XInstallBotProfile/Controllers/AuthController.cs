@@ -61,8 +61,13 @@ namespace XInstallBotProfile.Controllers
             return Ok(new
             {
                 AccessToken = newAccessToken,
-                UserId = user.Id,  // <-- Добавили UserId в ответ
-                Role = user.Role    // <-- Добавили Role в ответ
+                User = new User
+                {
+                    Id = user.Id,
+                    Login = user.Login,
+                    Role = user.Role,
+                    Nickname = user.Nickname,
+                }
             });
         }
 
