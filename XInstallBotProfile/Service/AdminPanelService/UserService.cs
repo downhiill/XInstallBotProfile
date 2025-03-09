@@ -125,17 +125,17 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 TotalCompletesCount = statistics.Sum(us => us.CompletesCount),
             };
 
-            // Рассчитываем средние показатели
-            var statisticAverages = new StatisticAverages
-            {
-                AverageTotal = statistics.Average(us => us.Total),
-                AverageAck = statistics.Average(us => us.Ack),
-                AverageWin = statistics.Average(us => us.Win),
-                AverageImpsCount = statistics.Average(us => us.ImpsCount),
-                AverageClicksCount = statistics.Average(us => us.ClicksCount),
-                AverageStartsCount = statistics.Average(us => us.StartsCount),
-                AverageCompletesCount = statistics.Average(us => us.CompletesCount),
-            };
+            //// Рассчитываем средние показатели
+            //var statisticAverages = new StatisticAverages
+            //{
+            //    AverageTotal = statistics.Average(us => us.Total),
+            //    AverageAck = statistics.Average(us => us.Ack),
+            //    AverageWin = statistics.Average(us => us.Win),
+            //    AverageImpsCount = statistics.Average(us => us.ImpsCount),
+            //    AverageClicksCount = statistics.Average(us => us.ClicksCount),
+            //    AverageStartsCount = statistics.Average(us => us.StartsCount),
+            //    AverageCompletesCount = statistics.Average(us => us.CompletesCount),
+            //};
 
             return new GetStatisticResponse
             {
