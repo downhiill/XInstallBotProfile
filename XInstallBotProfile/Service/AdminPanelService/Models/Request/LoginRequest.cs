@@ -7,7 +7,5 @@ namespace XInstallBotProfile.Service.AdminPanelService.Models.Request
         public string Login { get; set; }
 
         public string Password { get; set; }
-
-        public User User { get; set; }
     }
 }
