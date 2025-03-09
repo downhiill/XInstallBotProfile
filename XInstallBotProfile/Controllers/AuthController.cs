@@ -7,6 +7,9 @@ using XInstallBotProfile.Models;
 
 namespace XInstallBotProfile.Controllers
 {
+   /// <summary>
+   /// 
+   /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
