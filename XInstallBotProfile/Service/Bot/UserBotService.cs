@@ -29,6 +29,7 @@ namespace XInstallBotProfile.Service.Bot
                 Login = login,
                 PasswordHash = passwordHash,
                 JwtToken = jwtToken,
+                Role = role,
                 IsDsp = true
             };
 
