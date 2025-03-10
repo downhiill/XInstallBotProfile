@@ -56,7 +56,7 @@ namespace XInstallBotProfile.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddDays(7)
             });
 
@@ -154,7 +154,7 @@ namespace XInstallBotProfile.Controllers
             {
                 HttpOnly = true, // Доступен только через HTTP (нельзя прочитать через JS)
                 Secure = true, // Только по HTTPS
-                SameSite = SameSiteMode.Strict, // Используется только в рамках одного сайта
+                SameSite = SameSiteMode.None, // Используется только в рамках одного сайта
                 Expires = DateTime.UtcNow.AddDays(7) // Срок жизни куки
             });
 
