@@ -34,11 +34,11 @@ builder.Services.AddSingleton<BotService>(sp =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.AllowAnyOrigin()    // Allow access from any source
-              .AllowAnyMethod()    // Allow any HTTP methods (GET, POST, etc.)
-              .AllowAnyHeader();   // Allow any headers
+        policy.WithOrigins("https://weekkkk.github.io/") // Разрешённый источник
+              .AllowAnyMethod()  // Разрешаем любые HTTP-методы (GET, POST и т. д.)
+              .AllowAnyHeader(); // Разрешаем любые заголовки
     });
 });
 
