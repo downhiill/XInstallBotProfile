@@ -38,7 +38,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("https://weekkkk.github.io") // Разрешённый источник
               .AllowAnyMethod()  // Разрешаем любые HTTP-методы (GET, POST и т. д.)
-              .AllowAnyHeader(); // Разрешаем любые заголовки
+              .AllowAnyHeader() // Разрешаем любые заголовки
+              .AllowCredentials();
     });
 });
 
