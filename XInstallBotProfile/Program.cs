@@ -87,7 +87,8 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 }
 
 // Enable CORS for all routes
-app.UseCors("AllowAll");
+app.UseCors("AllowSpecificOrigin");
+
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
