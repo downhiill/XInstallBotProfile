@@ -121,11 +121,11 @@ namespace XInstallBotProfile.Controllers
         }
 
         [HttpDelete("deleteUserRecord")]
-        public async Task<IActionResult> DeleteUserRecord([FromBody] long id)
+        public async Task<IActionResult> DeleteUserRecord([FromBody] List<long> ids)
         {
             try
             {
-                await _userService.DeleteUserRecord(id);
+                await _userService.DeleteUserRecords(ids);
                 return Ok(new { message = "Пользователи успешно удалены!" });
             }
             catch (Exception ex)

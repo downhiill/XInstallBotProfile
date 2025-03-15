@@ -383,26 +383,28 @@ namespace XInstallBotProfile.Service.AdminPanelService
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteUserRecord(long id)
+        public async Task<bool> DeleteUserRecords(List<long> ids)
         {
-            // Находим запись по ID
-            var recordUser = await _dbContext.UserStatistics
-                .FirstOrDefaultAsync(us => us.Id == id);
+            // Находим записи, которые есть в списке
+            var recordsToDelete = await _dbContext.UserStatistics
+                .Where(us => ids.Contains(us.Id))
+                .ToListAsync();
 
-            // Если запись не найдена, возвращаем false
-            if (recordUser == null)
+            // Если нет записей для удаления, возвращаем false
+            if (!recordsToDelete.Any())
             {
                 return false;
             }
 
-            // Удаляем запись
-            _dbContext.UserStatistics.Remove(recordUser);
+            // Удаляем найденные записи
+            _dbContext.UserStatistics.RemoveRange(recordsToDelete);
 
             // Сохраняем изменения в базе данных
             await _dbContext.SaveChangesAsync();
 
             return true;
         }
+
 
 
         public async Task SaveUserChanges(SaveUserRequest request)
