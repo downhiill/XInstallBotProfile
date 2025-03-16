@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Globalization;
 using System.Security.Claims;
 using Telegram.Bot.Requests.Abstractions;
 using Telegram.Bot.Types;
@@ -320,42 +321,46 @@ namespace XInstallBotProfile.Service.AdminPanelService
             }
 
             // В зависимости от ключа, обновляем нужное поле
+            // В зависимости от ключа, обновляем нужное поле
             switch (request.Key.ToLower())
             {
                 case "total":
-                    statistic.Total = request.Value;
+                    statistic.Total = long.Parse(request.Value);
                     break;
                 case "ack":
-                    statistic.Ack = request.Value;
+                    statistic.Ack = long.Parse(request.Value);
                     break;
                 case "win":
-                    statistic.Win = request.Value;
+                    statistic.Win = long.Parse(request.Value);
+                    break;
+                case "date":
+                    statistic.Date = DateTime.Parse(request.Value);
                     break;
                 case "impscount":
-                    statistic.ImpsCount = request.Value;
+                    statistic.ImpsCount = long.Parse(request.Value);
                     break;
                 case "showrate":
-                    statistic.ShowRate = Convert.ToDecimal(request.Value);
+                    statistic.ShowRate = decimal.Parse(request.Value, CultureInfo.InvariantCulture);
                     break;
                 case "clickscount":
-                    statistic.ClicksCount = request.Value;
+                    statistic.ClicksCount = long.Parse(request.Value);
                     break;
                 case "ctr":
-                    statistic.Ctr = request.Value;
+                    statistic.Ctr = decimal.Parse(request.Value, CultureInfo.InvariantCulture);
                     break;
                 case "startscount":
-                    statistic.StartsCount = request.Value;
+                    statistic.StartsCount = long.Parse(request.Value);
                     break;
                 case "completescount":
-                    statistic.CompletesCount = request.Value;
+                    statistic.CompletesCount = long.Parse(request.Value);
                     break;
                 case "vtr":
-                    statistic.Vtr = request.Value;
+                    statistic.Vtr = decimal.Parse(request.Value, CultureInfo.InvariantCulture);
                     break;
                 default:
-                    // Возвращаем false, если ключ некорректен
-                    return false;
+                    return false; // Возвращаем false, если ключ некорректен
             }
+
 
             // Сохраняем изменения в базе данных
             await _dbContext.SaveChangesAsync();
