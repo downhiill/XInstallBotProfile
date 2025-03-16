@@ -254,12 +254,12 @@ namespace XInstallBotProfile.Service.AdminPanelService
             };
         }
 
-        public async Task<bool> CreateUserRecord (int UserId,CreateUserRecordRequest request)
+        public async Task<bool> CreateUserRecord(int UserId, CreateUserRecordRequest request)
         {
             var recordUser = new UserStatistic
             {
                 UserId = UserId,
-                Date = request.Date,
+                Date = request.Date.ToUniversalTime(), // ✅ Конвертация в UTC
                 Total = request.Total,
                 Ack = request.Ack,
                 Win = request.Win,
@@ -270,13 +270,14 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 IsDsp = request.IsDsp,
                 IsDspInApp = request.IsDspInApp,
                 IsDspBanner = request.IsDspBanner,
-                
             };
+
             _dbContext.UserStatistics.Add(recordUser);
             await _dbContext.SaveChangesAsync();
 
             return true;
         }
+
 
         public async Task<UpdateUsernameResponse> UpdateUsername(int id, UpdateUsernameRequest request)
         {
