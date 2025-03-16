@@ -9,7 +9,7 @@ namespace XInstallBotProfile.Controllers
 {
      // Это обеспечит доступ только для пользователей с ролью "Admin"
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [Route("api/admin")]
     public class AdminController : ControllerBase
     {
@@ -51,7 +51,7 @@ namespace XInstallBotProfile.Controllers
             var result = await _userService.UpdateUsername(id, request);
             return Ok(result);
         }
-        [HttpPatch("statistic/{id}")]
+        [HttpPatch("statistic")]
         public async Task<IActionResult> UpdateStatistic(UpdateStatisticRequest request)
         {
             var result = await _userService.UpdateStatistic(request);
