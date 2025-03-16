@@ -334,7 +334,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
                     statistic.Win = long.Parse(request.Value);
                     break;
                 case "date":
-                    statistic.Date = DateTime.Parse(request.Value);
+                    var dateValue = DateTime.Parse(request.Value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                    statistic.Date = dateValue.ToUniversalTime(); // Преобразуем в UTC
                     break;
                 case "impscount":
                     statistic.ImpsCount = long.Parse(request.Value);
