@@ -259,7 +259,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             var recordUser = new UserStatistic
             {
                 UserId = UserId,
-                Date = DateTime.UtcNow,
+                Date = request.Date,
                 Total = request.Total,
                 Ack = request.Ack,
                 Win = request.Win,
