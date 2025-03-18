@@ -1,4 +1,5 @@
-﻿using XInstallBotProfile.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using XInstallBotProfile.Models;
 using XInstallBotProfile.Service.AdminPanelService.Models.Request;
 using XInstallBotProfile.Service.AdminPanelService.Models.Response;
 
@@ -21,5 +22,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
         public Task<bool> UpdateStatistic(UpdateStatisticRequest request);
 
         public Task<GenerateUserResponse> GenerateUser();
+
+        public Task<IActionResult> ExportStatisticInExcel(GetStatisticRequest request);
     }
 }

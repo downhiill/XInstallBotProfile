@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 using XInstallBotProfile.Exepction;
 using XInstallBotProfile.Service.AdminPanelService;
 using XInstallBotProfile.Service.AdminPanelService.Models.Request;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace XInstallBotProfile.Controllers
 {
@@ -39,6 +41,30 @@ namespace XInstallBotProfile.Controllers
                 // Общая ошибка сервера
                 return StatusCode(500, new { message = "Произошла ошибка при обработке запроса." });
             }
+        }
+
+        [HttpGet("export-excel")]
+        public async Task<IActionResult> ExportStatisticInExcel([FromQuery] GetStatisticRequest request)
+        {
+            try
+            {
+                var result = await _userService.ExportStatisticInExcel(request);
+                return Ok(result);
+            }
+            catch(UnauthorizedAccessException ex) 
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch(ForbiddenAccessException ex)
+            {
+                return Forbid();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Произошла ошибка при обработке запроса." });
+            }
+            
+
         }
 
 

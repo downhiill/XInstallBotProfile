@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using OfficeOpenXml;
 using System.Globalization;
 using System.Security.Claims;
 using Telegram.Bot.Requests.Abstractions;
@@ -24,6 +25,93 @@ namespace XInstallBotProfile.Service.AdminPanelService
         {
             _dbContext = dbContext;
             _httpContextAccessor = httpContextAccessor;
+        }
+
+        public async Task<IActionResult> ExportStatisticInExcel(GetStatisticRequest request)
+        {
+            // 1. Получаем суммарную статистику
+            var statisticsResponse = await GetStatistic(request);
+            var totalStats = statisticsResponse.Total;
+
+            // 2. Загружаем детальную статистику пользователей
+            var userStats = _dbContext.UserStatistics.OrderByDescending(u => u.Date).ToList();
+
+            using (var package = new ExcelPackage())
+            {
+                // --- Первая таблица "Total Statistics" ---
+                var totalWorksheet = package.Workbook.Worksheets.Add("Total Statistics");
+
+                totalWorksheet.Cells[1, 1].Value = "Метрика";
+                totalWorksheet.Cells[1, 2].Value = "Значение";
+
+                totalWorksheet.Cells[2, 1].Value = "Total";
+                totalWorksheet.Cells[2, 2].Value = totalStats.Total;
+
+                totalWorksheet.Cells[3, 1].Value = "Ack";
+                totalWorksheet.Cells[3, 2].Value = totalStats.Ack;
+
+                totalWorksheet.Cells[4, 1].Value = "Win";
+                totalWorksheet.Cells[4, 2].Value = totalStats.Win;
+
+                totalWorksheet.Cells[5, 1].Value = "ImpsCount";
+                totalWorksheet.Cells[5, 2].Value = totalStats.ImpsCount;
+
+                totalWorksheet.Cells[6, 1].Value = "ClicksCount";
+                totalWorksheet.Cells[6, 2].Value = totalStats.ClicksCount;
+
+                totalWorksheet.Cells[7, 1].Value = "ShowRate";
+                totalWorksheet.Cells[7, 2].Value = totalStats.ShowRate;
+
+                totalWorksheet.Cells[8, 1].Value = "CTR";
+                totalWorksheet.Cells[8, 2].Value = totalStats.Ctr;
+
+                totalWorksheet.Cells[9, 1].Value = "VTR";
+                totalWorksheet.Cells[9, 2].Value = totalStats.Vtr;
+
+                totalWorksheet.Cells[10, 1].Value = "StartsCount";
+                totalWorksheet.Cells[10, 2].Value = totalStats.StartsCount;
+
+                totalWorksheet.Cells[11, 1].Value = "CompletesCount";
+                totalWorksheet.Cells[11, 2].Value = totalStats.CompletesCount;
+
+                // --- Вторая таблица "User Statistics" ---
+                var userWorksheet = package.Workbook.Worksheets.Add("User Statistics");
+
+                // Заголовки
+                userWorksheet.Cells[1, 1].Value = "UserId";
+                userWorksheet.Cells[1, 2].Value = "Date";
+                userWorksheet.Cells[1, 3].Value = "ImpsCount";
+                userWorksheet.Cells[1, 4].Value = "ClicksCount";
+                userWorksheet.Cells[1, 5].Value = "VTR";
+                userWorksheet.Cells[1, 6].Value = "CTR";
+
+                // Заполняем данными
+                int row = 2;
+                foreach (var stat in userStats)
+                {
+                    userWorksheet.Cells[row, 1].Value = stat.UserId;
+                    userWorksheet.Cells[row, 2].Value = stat.Date.ToString("yyyy-MM-dd");
+                    userWorksheet.Cells[row, 3].Value = stat.ImpsCount;
+                    userWorksheet.Cells[row, 4].Value = stat.ClicksCount;
+                    userWorksheet.Cells[row, 5].Value = stat.Vtr;
+                    userWorksheet.Cells[row, 6].Value = stat.Ctr;
+                    row++;
+                }
+
+                // Форматируем таблицы
+                totalWorksheet.Cells.AutoFitColumns();
+                userWorksheet.Cells.AutoFitColumns();
+
+                // Отдаем файл пользователю
+                var stream = new MemoryStream();
+                package.SaveAs(stream);
+                stream.Position = 0;
+
+                return new FileContentResult(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    FileDownloadName = "Statistics.xlsx"
+                };
+            }
         }
 
         public async Task<GetAllUsersResponse> GetAllUsers()
