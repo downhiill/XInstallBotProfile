@@ -43,7 +43,7 @@ namespace XInstallBotProfile.Controllers
             }
         }
 
-        [HttpGet("export-excel")]
+        [HttpPost("export-excel")]
         public async Task<IActionResult> ExportStatisticInExcel([FromQuery] GetStatisticRequest request)
         {
             try
