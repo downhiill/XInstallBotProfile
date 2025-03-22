@@ -33,7 +33,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
         public async Task<FileContentResult> ExportStatisticInExcel(GetStatisticRequest request)
         {
             // Получаем данные для экспорта
-            var statisticData = await GetStatistic(request);
+            var statisticData = await GetStatisticForExport(request);
 
             // Создаем Excel файл
             using (var package = new ExcelPackage())
@@ -131,7 +131,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
         {
             QuestPDF.Settings.License = LicenseType.Community;
             // Получаем данные для экспорта
-            var statisticData = await GetStatistic(request);
+            var statisticData = await GetStatisticForExport(request);
 
             // Создаем PDF документ
             var pdfBytes = QuestPDF.Fluent.Document.Create(container =>
@@ -398,6 +398,75 @@ namespace XInstallBotProfile.Service.AdminPanelService
             };
 
             
+
+            return new GetStatisticResponse
+            {
+                UserStatistics = statistics,
+                Total = statisticTotal,
+                TotalAllTime = totalShowRate,
+                Averages = statisticAverages // Добавляем средние показатели в ответ
+            };
+        }
+
+        private async Task<GetStatisticResponse> GetStatisticForExport(GetStatisticRequest request)
+        {
+            var statisticsQuery = _dbContext.UserStatistics
+                 .Where(us => us.UserId == request.UserId)
+                 .Where(us => us.IsDsp == request.IsDsp)
+                 .Where(us => us.IsDspInApp == request.IsDspInApp)
+                 .Where(us => us.IsDspBanner == request.IsDspBanner);
+
+
+            var totalShowRate = await _dbContext.UserStatistics
+                .Where(us => us.UserId == request.UserId)
+                .Where(us => us.IsDsp == request.IsDsp)
+                .Where(us => us.IsDspInApp == request.IsDspInApp)
+                .Where(us => us.IsDspBanner == request.IsDspBanner)
+                .SumAsync(us => us.Total); // Сумма Total за всё время
+
+            // Фильтрация по дате, если параметры заданы
+            if (request.StartDate.HasValue)
+            {
+                statisticsQuery = statisticsQuery.Where(us => us.Date >= request.StartDate.Value);
+            }
+
+            if (request.EndDate.HasValue)
+            {
+                statisticsQuery = statisticsQuery.Where(us => us.Date <= request.EndDate.Value);
+            }
+
+            var statistics = await statisticsQuery.ToListAsync();
+
+
+            var statisticTotal = new StatisticTotal
+            {
+                Total = statistics.Sum(us => us.Total),
+                Ack = statistics.Sum(us => us.Ack),
+                Win = statistics.Sum(us => us.Win),
+                ImpsCount = statistics.Sum(us => us.ImpsCount),
+                ClicksCount = statistics.Sum(us => us.ClicksCount),
+                ShowRate = statistics.Sum(us => us.ShowRate),
+                Ctr = statistics.Sum(us => us.Ctr),
+                Vtr = statistics.Sum(us => us.Vtr),
+                StartsCount = statistics.Sum(us => us.StartsCount),
+                CompletesCount = statistics.Sum(us => us.CompletesCount),
+            };
+
+            var statisticAverages = new StatisticAverages
+            {
+                Total = statistics.Any() ? statistics.Average(us => us.Total) : 0,
+                Ack = statistics.Any() ? statistics.Average(us => us.Ack) : 0,
+                Win = statistics.Any() ? statistics.Average(us => us.Win) : 0,
+                Ctr = statistics.Any() ? statistics.Average(us => us.Ctr) : 0,
+                Vtr = statistics.Any() ? statistics.Average(us => us.Vtr) : 0,
+                ShowRate = statistics.Any() ? statistics.Average(us => us.ShowRate) : 0,
+                ImpsCount = statistics.Any() ? statistics.Average(us => us.ImpsCount) : 0,
+                ClicksCount = statistics.Any() ? statistics.Average(us => us.ClicksCount) : 0,
+                StartsCount = statistics.Any() ? statistics.Average(us => us.StartsCount) : 0,
+                CompletesCount = statistics.Any() ? statistics.Average(us => us.CompletesCount) : 0,
+            };
+
+
 
             return new GetStatisticResponse
             {
