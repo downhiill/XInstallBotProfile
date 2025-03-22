@@ -138,8 +138,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
             {
                 container.Page(page =>
                 {
-                    page.Size(PageSizes.A4);
-                    page.Margin(2, Unit.Centimetre);
+                    page.Size(PageSizes.A2);
+                    page.Margin(5, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(12));
 
