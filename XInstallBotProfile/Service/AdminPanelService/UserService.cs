@@ -129,6 +129,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
         public async Task<FileContentResult> ExportStatisticInPdf(GetStatisticRequest request)
         {
+            QuestPDF.Settings.License = LicenseType.Community;
             // Получаем данные для экспорта
             var statisticData = await GetStatistic(request);
 
