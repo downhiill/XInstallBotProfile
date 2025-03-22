@@ -27,94 +27,104 @@ namespace XInstallBotProfile.Service.AdminPanelService
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<IActionResult> ExportStatisticInExcel(GetStatisticRequest request)
+        public async Task<FileContentResult> ExportStatisticInExcel(GetStatisticRequest request)
         {
-            // 1. Получаем суммарную статистику
-            var statisticsResponse = await GetStatistic(request);
-            var totalStats = statisticsResponse.Total;
+            // Получаем данные для экспорта
+            var statisticData = await GetStatistic(request);
 
-            // 2. Загружаем детальную статистику пользователей
-            var userStats = _dbContext.UserStatistics.OrderByDescending(u => u.Date).ToList();
-
+            // Создаем Excel файл
             using (var package = new ExcelPackage())
             {
-                // --- Первая таблица "Total Statistics" ---
-                var totalWorksheet = package.Workbook.Worksheets.Add("Total Statistics");
+                // Создаем лист
+                var worksheet = package.Workbook.Worksheets.Add("Статистика");
 
-                totalWorksheet.Cells[1, 1].Value = "Метрика";
-                totalWorksheet.Cells[1, 2].Value = "Значение";
+                // Заголовки столбцов
+                worksheet.Cells[1, 1].Value = "Дата";
+                worksheet.Cells[1, 2].Value = "Total";
+                worksheet.Cells[1, 3].Value = "Ack";
+                worksheet.Cells[1, 4].Value = "Win";
+                worksheet.Cells[1, 5].Value = "ImpsCount";
+                worksheet.Cells[1, 6].Value = "ClicksCount";
+                worksheet.Cells[1, 7].Value = "StartsCount";
+                worksheet.Cells[1, 8].Value = "CompletesCount";
+                worksheet.Cells[1, 9].Value = "ShowRate";
+                worksheet.Cells[1, 10].Value = "CTR";
+                worksheet.Cells[1, 11].Value = "VTR";
+                worksheet.Cells[1, 12].Value = "IsDsp";
+                worksheet.Cells[1, 13].Value = "IsDspInApp";
+                worksheet.Cells[1, 14].Value = "IsDspBanner";
 
-                totalWorksheet.Cells[2, 1].Value = "Total";
-                totalWorksheet.Cells[2, 2].Value = totalStats.Total;
-
-                totalWorksheet.Cells[3, 1].Value = "Ack";
-                totalWorksheet.Cells[3, 2].Value = totalStats.Ack;
-
-                totalWorksheet.Cells[4, 1].Value = "Win";
-                totalWorksheet.Cells[4, 2].Value = totalStats.Win;
-
-                totalWorksheet.Cells[5, 1].Value = "ImpsCount";
-                totalWorksheet.Cells[5, 2].Value = totalStats.ImpsCount;
-
-                totalWorksheet.Cells[6, 1].Value = "ClicksCount";
-                totalWorksheet.Cells[6, 2].Value = totalStats.ClicksCount;
-
-                totalWorksheet.Cells[7, 1].Value = "ShowRate";
-                totalWorksheet.Cells[7, 2].Value = totalStats.ShowRate;
-
-                totalWorksheet.Cells[8, 1].Value = "CTR";
-                totalWorksheet.Cells[8, 2].Value = totalStats.Ctr;
-
-                totalWorksheet.Cells[9, 1].Value = "VTR";
-                totalWorksheet.Cells[9, 2].Value = totalStats.Vtr;
-
-                totalWorksheet.Cells[10, 1].Value = "StartsCount";
-                totalWorksheet.Cells[10, 2].Value = totalStats.StartsCount;
-
-                totalWorksheet.Cells[11, 1].Value = "CompletesCount";
-                totalWorksheet.Cells[11, 2].Value = totalStats.CompletesCount;
-
-                // --- Вторая таблица "User Statistics" ---
-                var userWorksheet = package.Workbook.Worksheets.Add("User Statistics");
-
-                // Заголовки
-                userWorksheet.Cells[1, 1].Value = "UserId";
-                userWorksheet.Cells[1, 2].Value = "Date";
-                userWorksheet.Cells[1, 3].Value = "ImpsCount";
-                userWorksheet.Cells[1, 4].Value = "ClicksCount";
-                userWorksheet.Cells[1, 5].Value = "VTR";
-                userWorksheet.Cells[1, 6].Value = "CTR";
-
-                // Заполняем данными
+                // Заполняем данные
                 int row = 2;
-                foreach (var stat in userStats)
+                foreach (var stat in statisticData.UserStatistics)
                 {
-                    userWorksheet.Cells[row, 1].Value = stat.UserId;
-                    userWorksheet.Cells[row, 2].Value = stat.Date.ToString("yyyy-MM-dd");
-                    userWorksheet.Cells[row, 3].Value = stat.ImpsCount;
-                    userWorksheet.Cells[row, 4].Value = stat.ClicksCount;
-                    userWorksheet.Cells[row, 5].Value = stat.Vtr;
-                    userWorksheet.Cells[row, 6].Value = stat.Ctr;
+                    worksheet.Cells[row, 1].Value = stat.Date.ToString("yyyy-MM-dd");
+                    worksheet.Cells[row, 2].Value = stat.Total;
+                    worksheet.Cells[row, 3].Value = stat.Ack;
+                    worksheet.Cells[row, 4].Value = stat.Win;
+                    worksheet.Cells[row, 5].Value = stat.ImpsCount;
+                    worksheet.Cells[row, 6].Value = stat.ClicksCount;
+                    worksheet.Cells[row, 7].Value = stat.StartsCount;
+                    worksheet.Cells[row, 8].Value = stat.CompletesCount;
+                    worksheet.Cells[row, 9].Value = stat.ShowRate;
+                    worksheet.Cells[row, 10].Value = stat.Ctr;
+                    worksheet.Cells[row, 11].Value = stat.Vtr;
+                    worksheet.Cells[row, 12].Value = stat.IsDsp;
+                    worksheet.Cells[row, 13].Value = stat.IsDspInApp;
+                    worksheet.Cells[row, 14].Value = stat.IsDspBanner;
                     row++;
                 }
 
-                // Форматируем таблицы
-                totalWorksheet.Cells.AutoFitColumns();
-                userWorksheet.Cells.AutoFitColumns();
+                // Добавляем итоговые значения
+                worksheet.Cells[row, 1].Value = "Итого";
+                worksheet.Cells[row, 2].Value = statisticData.Total.Total;
+                worksheet.Cells[row, 3].Value = statisticData.Total.Ack;
+                worksheet.Cells[row, 4].Value = statisticData.Total.Win;
+                worksheet.Cells[row, 5].Value = statisticData.Total.ImpsCount;
+                worksheet.Cells[row, 6].Value = statisticData.Total.ClicksCount;
+                worksheet.Cells[row, 7].Value = statisticData.Total.StartsCount;
+                worksheet.Cells[row, 8].Value = statisticData.Total.CompletesCount;
+                worksheet.Cells[row, 9].Value = statisticData.Total.ShowRate;
+                worksheet.Cells[row, 10].Value = statisticData.Total.Ctr;
+                worksheet.Cells[row, 11].Value = statisticData.Total.Vtr;
 
-                // Отдаем файл пользователю
-                var stream = new MemoryStream();
-                package.SaveAs(stream);
-                stream.Position = 0;
+                // Добавляем средние значения
+                row++;
+                worksheet.Cells[row, 1].Value = "Средние";
+                worksheet.Cells[row, 2].Value = statisticData.Averages.Total;
+                worksheet.Cells[row, 3].Value = statisticData.Averages.Ack;
+                worksheet.Cells[row, 4].Value = statisticData.Averages.Win;
+                worksheet.Cells[row, 5].Value = statisticData.Averages.ImpsCount;
+                worksheet.Cells[row, 6].Value = statisticData.Averages.ClicksCount;
+                worksheet.Cells[row, 7].Value = statisticData.Averages.StartsCount;
+                worksheet.Cells[row, 8].Value = statisticData.Averages.CompletesCount;
+                worksheet.Cells[row, 9].Value = statisticData.Averages.ShowRate;
+                worksheet.Cells[row, 10].Value = statisticData.Averages.Ctr;
+                worksheet.Cells[row, 11].Value = statisticData.Averages.Vtr;
 
-                return new FileContentResult(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                // Форматируем заголовки
+                using (var range = worksheet.Cells[1, 1, 1, 14])
                 {
-                    FileDownloadName = "Statistics.xlsx"
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                }
+
+                // Автонастройка ширины столбцов
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                // Преобразуем в массив байтов
+                var fileContents = package.GetAsByteArray();
+
+                // Возвращаем файл
+                return new FileContentResult(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    FileDownloadName = $"Статистика_{request.StartDate?.ToString("yyyy-MM-dd")}_{request.EndDate?.ToString("yyyy-MM-dd")}.xlsx"
                 };
             }
         }
 
-        public async Task<GetAllUsersResponse> GetAllUsers()
+    public async Task<GetAllUsersResponse> GetAllUsers()
         {
             
 

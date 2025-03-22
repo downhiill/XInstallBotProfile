@@ -23,6 +23,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
         public Task<GenerateUserResponse> GenerateUser();
 
-        public Task<IActionResult> ExportStatisticInExcel(GetStatisticRequest request);
+        public Task<FileContentResult> ExportStatisticInExcel(GetStatisticRequest request);
     }
 }

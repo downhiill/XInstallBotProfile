@@ -48,27 +48,15 @@ namespace XInstallBotProfile.Controllers
         {
             try
             {
-                var result = await _userService.ExportStatisticInExcel(request);
-                return Ok(result);
+                var fileResult = await _userService.ExportStatisticInExcel(request);
+                return fileResult;
             }
-            //catch(UnauthorizedAccessException ex) 
-            //{
-            //    return Unauthorized(new { message = ex.Message });
-            //}
-            //catch(ForbiddenAccessException ex)
-            //{
-            //    return Forbid();
-            //}
             catch (Exception ex)
             {
-                // Log the exception details
-                Console.WriteLine(ex);  // Replace with proper logging
+                // Логирование ошибки
+                Console.WriteLine(ex);  // Замените на нормальное логирование
                 return StatusCode(500, new { message = "Произошла ошибка при обработке запроса." });
             }
-
-
         }
-
-
     }
 }
