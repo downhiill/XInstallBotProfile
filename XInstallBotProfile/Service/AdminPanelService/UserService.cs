@@ -224,19 +224,19 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
         public async Task<GetStatisticResponse> GetStatistic(GetStatisticRequest request)
         {
-            var currentUserId = GetCurrentUserId();
-            var currentUserRole = GetCurrentUserRole();
+            //var currentUserId = GetCurrentUserId();
+            //var currentUserRole = GetCurrentUserRole();
 
-            if (currentUserId == 0)
-            {
-                throw new UnauthorizedAccessException("Необходима авторизация для выполнения запроса.");
-            }
+            //if (currentUserId == 0)
+            //{
+            //    throw new UnauthorizedAccessException("Необходима авторизация для выполнения запроса.");
+            //}
 
-            if (currentUserRole != "Admin" && request.UserId != currentUserId)
-            {
-                // Если пользователь не администратор и пытается запросить чужую информацию
-                throw new ForbiddenAccessException("У вас нет прав для запроса этой информации.");
-            }
+            //if (currentUserRole != "Admin" && request.UserId != currentUserId)
+            //{
+            //    // Если пользователь не администратор и пытается запросить чужую информацию
+            //    throw new ForbiddenAccessException("У вас нет прав для запроса этой информации.");
+            //}
 
             var statisticsQuery = _dbContext.UserStatistics
                  .Where(us => us.UserId == request.UserId)

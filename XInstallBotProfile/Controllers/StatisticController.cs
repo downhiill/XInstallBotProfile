@@ -54,7 +54,7 @@ namespace XInstallBotProfile.Controllers
             catch (Exception ex)
             {
                 // Логирование ошибки
-                Console.WriteLine(ex);  // Замените на нормальное логирование
+                Console.WriteLine(ex); 
                 return StatusCode(500, new { message = "Произошла ошибка при обработке запроса." });
             }
         }
