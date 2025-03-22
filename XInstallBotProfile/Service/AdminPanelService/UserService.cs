@@ -281,7 +281,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 IsDsp = user.IsDsp,
                 IsDspInApp = user.IsDspInApp,
                 IsDspBanner = user.IsDspBanner
-                // Дополнительно можно добавить другие поля, которые нужны в ответе
             };
 
             return response;
@@ -306,7 +305,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 {
                     Id = userId,
                     Login = userLogin,
-                    PasswordHash = HashPassword(userPassword), // Хэшируем пароль
+                    PasswordHash = HashPassword(userPassword), 
                     Nickname = userName
                 };
 
@@ -323,26 +322,24 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
         private string HashPassword(string password)
         {
-            // Предполагаем, что у вас есть метод для хэширования пароля
-            // Пример: использование BCrypt для хэширования пароля
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
         public async Task<GetStatisticResponse> GetStatistic(GetStatisticRequest request)
         {
-            //var currentUserId = GetCurrentUserId();
-            //var currentUserRole = GetCurrentUserRole();
+            var currentUserId = GetCurrentUserId();
+            var currentUserRole = GetCurrentUserRole();
 
-            //if (currentUserId == 0)
-            //{
-            //    throw new UnauthorizedAccessException("Необходима авторизация для выполнения запроса.");
-            //}
+            if (currentUserId == 0)
+            {
+                throw new UnauthorizedAccessException("Необходима авторизация для выполнения запроса.");
+            }
 
-            //if (currentUserRole != "Admin" && request.UserId != currentUserId)
-            //{
-            //    // Если пользователь не администратор и пытается запросить чужую информацию
-            //    throw new ForbiddenAccessException("У вас нет прав для запроса этой информации.");
-            //}
+            if (currentUserRole != "Admin" && request.UserId != currentUserId)
+            {
+                // Если пользователь не администратор и пытается запросить чужую информацию
+                throw new ForbiddenAccessException("У вас нет прав для запроса этой информации.");
+            }
 
             var statisticsQuery = _dbContext.UserStatistics
                  .Where(us => us.UserId == request.UserId)
@@ -463,7 +460,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             var recordUser = new UserStatistic
             {
                 UserId = UserId,
-                Date = request.Date.ToUniversalTime(), // ✅ Конвертация в UTC
+                Date = request.Date.ToUniversalTime(), 
                 Total = request.Total,
                 Ack = request.Ack,
                 Win = request.Win,
