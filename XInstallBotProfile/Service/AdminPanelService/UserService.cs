@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OfficeOpenXml;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 using System.Globalization;
 using System.Security.Claims;
 using Telegram.Bot.Requests.Abstractions;
@@ -124,7 +127,109 @@ namespace XInstallBotProfile.Service.AdminPanelService
             }
         }
 
-    public async Task<GetAllUsersResponse> GetAllUsers()
+        public async Task<FileContentResult> ExportStatisticInPdf(GetStatisticRequest request)
+        {
+            // Получаем данные для экспорта
+            var statisticData = await GetStatistic(request);
+
+            // Создаем PDF документ
+            var pdfBytes = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(2, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(12));
+
+                    // Заголовок
+                    page.Header()
+                        .Text("Статистика")
+                        .SemiBold().FontSize(24).FontColor(Colors.Blue.Medium);
+
+                    // Таблица с данными
+                    page.Content()
+                        .PaddingVertical(1, Unit.Centimetre)
+                        .Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(); // Дата
+                                columns.RelativeColumn(); // Total
+                                columns.RelativeColumn(); // Ack
+                                columns.RelativeColumn(); // Win
+                                columns.RelativeColumn(); // ImpsCount
+                                columns.RelativeColumn(); // ClicksCount
+                                columns.RelativeColumn(); // StartsCount
+                                columns.RelativeColumn(); // CompletesCount
+                                columns.RelativeColumn(); // ShowRate
+                                columns.RelativeColumn(); // CTR
+                                columns.RelativeColumn(); // VTR
+                                columns.RelativeColumn(); // Тип рекламы
+                            });
+
+                            // Заголовки столбцов
+                            table.Header(header =>
+                            {
+                                header.Cell().Text("Дата");
+                                header.Cell().Text("Total");
+                                header.Cell().Text("Ack");
+                                header.Cell().Text("Win");
+                                header.Cell().Text("ImpsCount");
+                                header.Cell().Text("ClicksCount");
+                                header.Cell().Text("StartsCount");
+                                header.Cell().Text("CompletesCount");
+                                header.Cell().Text("ShowRate");
+                                header.Cell().Text("CTR");
+                                header.Cell().Text("VTR");
+                                header.Cell().Text("Тип рекламы");
+
+                                header.Cell().ColumnSpan(12).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
+                            });
+
+                            // Данные
+                            foreach (var stat in statisticData.UserStatistics)
+                            {
+                                table.Cell().Text(stat.Date.ToString("yyyy-MM-dd"));
+                                table.Cell().Text(stat.Total.ToString());
+                                table.Cell().Text(stat.Ack.ToString());
+                                table.Cell().Text(stat.Win.ToString());
+                                table.Cell().Text(stat.ImpsCount.ToString());
+                                table.Cell().Text(stat.ClicksCount.ToString());
+                                table.Cell().Text(stat.StartsCount.ToString());
+                                table.Cell().Text(stat.CompletesCount.ToString());
+                                table.Cell().Text(stat.ShowRate.ToString("F2"));
+                                table.Cell().Text(stat.Ctr.ToString("F2"));
+                                table.Cell().Text(stat.Vtr.ToString("F2"));
+
+                                string adType = "";
+                                if (stat.IsDsp) adType += "DSP; ";
+                                if (stat.IsDspInApp) adType += "In-App; ";
+                                if (stat.IsDspBanner) adType += "Banner; ";
+                                table.Cell().Text(adType.TrimEnd(';', ' '));
+                            }
+                        });
+
+                    // Итоговые значения
+                    page.Footer()
+                        .AlignCenter()
+                        .Text(x =>
+                        {
+                            x.Span("Итого: ");
+                            x.Span($"Total: {statisticData.Total.Total}, Ack: {statisticData.Total.Ack}, Win: {statisticData.Total.Win}, ImpsCount: {statisticData.Total.ImpsCount}, ClicksCount: {statisticData.Total.ClicksCount}, StartsCount: {statisticData.Total.StartsCount}, CompletesCount: {statisticData.Total.CompletesCount}, ShowRate: {statisticData.Total.ShowRate:F2}, CTR: {statisticData.Total.Ctr:F2}, VTR: {statisticData.Total.Vtr:F2}");
+                        });
+                });
+            })
+            .GeneratePdf(); // Генерация PDF в виде массива байтов
+
+            // Возвращаем файл
+            return new FileContentResult(pdfBytes, "application/pdf")
+            {
+                FileDownloadName = $"Статистика_{request.StartDate?.ToString("yyyy-MM-dd")}_{request.EndDate?.ToString("yyyy-MM-dd")}.pdf"
+            };
+        }
+
+        public async Task<GetAllUsersResponse> GetAllUsers()
         {
             
 

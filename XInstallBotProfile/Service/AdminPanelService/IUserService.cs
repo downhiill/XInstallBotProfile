@@ -24,5 +24,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
         public Task<GenerateUserResponse> GenerateUser();
 
         public Task<FileContentResult> ExportStatisticInExcel(GetStatisticRequest request);
+
+        public Task<FileContentResult> ExportStatisticInPdf(GetStatisticRequest request);
     }
 }

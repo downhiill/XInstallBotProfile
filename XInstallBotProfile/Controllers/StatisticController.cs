@@ -51,10 +51,41 @@ namespace XInstallBotProfile.Controllers
                 var fileResult = await _userService.ExportStatisticInExcel(request);
                 return fileResult;
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (ForbiddenAccessException ex)
+            {
+                return Forbid();
+            }
             catch (Exception ex)
             {
                 // Логирование ошибки
                 Console.WriteLine(ex); 
+                return StatusCode(500, new { message = "Произошла ошибка при обработке запроса." });
+            }
+        }
+
+        [HttpPost("export-pdf")]
+        public async Task<IActionResult> ExportStatisticInPdf([FromQuery] GetStatisticRequest request)
+        {
+            try
+            {
+                var fileResult = await _userService.ExportStatisticInPdf(request);
+                return fileResult;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (ForbiddenAccessException ex)
+            {
+                return Forbid();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);  // Замените на нормальное логирование
                 return StatusCode(500, new { message = "Произошла ошибка при обработке запроса." });
             }
         }
