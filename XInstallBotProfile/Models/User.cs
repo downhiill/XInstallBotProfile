@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string? Role { get; set; }
+        public string? Role { get; set; } = "User";
         public string Login { get; set; }
         public string? Nickname { get; set; }
         public string PasswordHash { get; set; }
