@@ -53,9 +53,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 worksheet.Cells[1, 9].Value = "ShowRate";
                 worksheet.Cells[1, 10].Value = "CTR";
                 worksheet.Cells[1, 11].Value = "VTR";
-                worksheet.Cells[1, 12].Value = "IsDsp";
-                worksheet.Cells[1, 13].Value = "IsDspInApp";
-                worksheet.Cells[1, 14].Value = "IsDspBanner";
 
                 // Заполняем данные
                 int row = 2;
@@ -72,9 +69,6 @@ namespace XInstallBotProfile.Service.AdminPanelService
                     worksheet.Cells[row, 9].Value = stat.ShowRate;
                     worksheet.Cells[row, 10].Value = stat.Ctr;
                     worksheet.Cells[row, 11].Value = stat.Vtr;
-                    worksheet.Cells[row, 12].Value = stat.IsDsp;
-                    worksheet.Cells[row, 13].Value = stat.IsDspInApp;
-                    worksheet.Cells[row, 14].Value = stat.IsDspBanner;
                     row++;
                 }
 
