@@ -301,7 +301,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                         Username = u.Nickname,
                         CreatedAt = u.CreatedAt,
                         Login = u.Login, // Логин
-                        PasswordHash = u.PasswordHash, // Хэш пароля
+                        PasswordHash = u.PasswordHash, 
                         IsDsp = u.IsDsp,
                         IsDspInApp = u.IsDspInApp,
                         IsDspBanner = u.IsDspBanner

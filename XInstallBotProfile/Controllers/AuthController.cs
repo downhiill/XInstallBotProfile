@@ -33,11 +33,11 @@ namespace XInstallBotProfile.Controllers
                 return Unauthorized("Неверный логин или пароль.");
             }
 
-            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
-            if (!isPasswordValid)
+            if (model.Password != user.PasswordHash)
             {
                 return Unauthorized("Неверный логин или пароль.");
             }
+
 
             // Генерация нового access токена с UserId и Role
             var newAccessToken = TokenGenerator.GenerateAccessToken(user.Login, user.Id, user.Role);
