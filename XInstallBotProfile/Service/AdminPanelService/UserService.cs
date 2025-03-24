@@ -130,6 +130,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             // Загрузка изображения как byte[]
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "svglogo_instal 2.png");
             byte[] watermarkImageBytes = File.ReadAllBytes(imagePath);
+
             // Создаем PDF документ
             var pdfBytes = QuestPDF.Fluent.Document.Create(container =>
             {
@@ -140,11 +141,9 @@ namespace XInstallBotProfile.Service.AdminPanelService
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(12));
 
-
-
+                    // Все содержимое добавляется внутри одного вызова Content()
                     page.Content().AlignRight().AlignTop()
                     .Image(watermarkImageBytes, ImageScaling.FitHeight);
-
 
                     // Заголовок
                     page.Header()
@@ -232,6 +231,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 FileDownloadName = $"Статистика_{request.StartDate?.ToString("yyyy-MM-dd")}_{request.EndDate?.ToString("yyyy-MM-dd")}.pdf"
             };
         }
+
 
         public async Task<GetAllUsersResponse> GetAllUsers()
         {
