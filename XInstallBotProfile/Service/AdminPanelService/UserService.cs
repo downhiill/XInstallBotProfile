@@ -127,6 +127,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
             // Получаем данные для экспорта
             var statisticData = await GetStatisticForExport(request);
 
+            // Загрузка изображения как byte[]
+            byte[] watermarkImageBytes = File.ReadAllBytes("path_to_watermark_image.jpg");
             // Создаем PDF документ
             var pdfBytes = QuestPDF.Fluent.Document.Create(container =>
             {
@@ -136,6 +138,12 @@ namespace XInstallBotProfile.Service.AdminPanelService
                     page.Margin(5, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(12));
+
+
+
+                    page.Content().AlignRight().AlignTop()
+                .Image(watermarkImageBytes, ImageScaling.FitHeight);
+
 
                     // Заголовок
                     page.Header()
@@ -205,9 +213,9 @@ namespace XInstallBotProfile.Service.AdminPanelService
                             }
                         });
 
-                    // Итоговые значения
-                    page.Footer()
-                        .AlignCenter()
+                    // Перемещение итоговых значений в конец таблицы
+                    page.Content()
+                        .PaddingTop(10)
                         .Text(x =>
                         {
                             x.Span("Итого: ");
