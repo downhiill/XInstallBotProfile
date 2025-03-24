@@ -142,18 +142,19 @@ namespace XInstallBotProfile.Service.AdminPanelService
                     page.DefaultTextStyle(x => x.FontSize(12));
 
                     // Все содержимое добавляется внутри одного вызова Content()
-                    page.Content().AlignRight().AlignTop()
-                    .Image(watermarkImageBytes, ImageScaling.FitHeight);
+                    page.Content().Column(column =>
+                    {
+                        // Водяной знак (выравнивание в правый верхний угол)
+                        column.Item().AlignRight().AlignTop()
+                            .Image(watermarkImageBytes, ImageScaling.FitHeight);
 
-                    // Заголовок
-                    page.Header()
-                        .Text("Статистика")
-                        .SemiBold().FontSize(24).FontColor(Colors.Blue.Medium);
+                        // Заголовок
+                        column.Item().PaddingBottom(10)
+                            .Text("Статистика")
+                            .SemiBold().FontSize(24).FontColor(Colors.Blue.Medium);
 
-                    // Таблица с данными
-                    page.Content()
-                        .PaddingVertical(1, Unit.Centimetre)
-                        .Table(table =>
+                        // Таблица с данными
+                        column.Item().Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
                             {
@@ -213,17 +214,17 @@ namespace XInstallBotProfile.Service.AdminPanelService
                             }
                         });
 
-                    // Перемещение итоговых значений в конец таблицы
-                    page.Content()
-                        .PaddingTop(10)
-                        .Text(x =>
-                        {
-                            x.Span("Итого: ");
-                            x.Span($"Total: {statisticData.Total.Total}, Ack: {statisticData.Total.Ack}, Win: {statisticData.Total.Win}, ImpsCount: {statisticData.Total.ImpsCount}, ClicksCount: {statisticData.Total.ClicksCount}, StartsCount: {statisticData.Total.StartsCount}, CompletesCount: {statisticData.Total.CompletesCount}, ShowRate: {statisticData.Total.ShowRate:F2}, CTR: {statisticData.Total.Ctr:F2}, VTR: {statisticData.Total.Vtr:F2}");
-                        });
+                        // Итоговые значения
+                        column.Item().PaddingTop(10)
+                            .Text(x =>
+                            {
+                                x.Span("Итого: ");
+                                x.Span($"Total: {statisticData.Total.Total}, Ack: {statisticData.Total.Ack}, Win: {statisticData.Total.Win}, ImpsCount: {statisticData.Total.ImpsCount}, ClicksCount: {statisticData.Total.ClicksCount}, StartsCount: {statisticData.Total.StartsCount}, CompletesCount: {statisticData.Total.CompletesCount}, ShowRate: {statisticData.Total.ShowRate:F2}, CTR: {statisticData.Total.Ctr:F2}, VTR: {statisticData.Total.Vtr:F2}");
+                            });
+                    });
                 });
             })
-            .GeneratePdf(); // Генерация PDF в виде массива байтов
+            .GeneratePdf();
 
             // Возвращаем файл
             return new FileContentResult(pdfBytes, "application/pdf")
