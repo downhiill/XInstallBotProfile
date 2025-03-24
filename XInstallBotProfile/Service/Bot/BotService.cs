@@ -37,7 +37,7 @@ namespace XInstallBotProfile.Service.Bot
                         // Пользователь не найден, создаем нового
                         var login = CredentialGenerator.GenerateLogin();
                         var password = CredentialGenerator.GeneratePassword();
-                        var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+                        var passwordHash = password;
 
                         // Получаем максимальный userId из базы данных и инкрементируем его для нового пользователя
                         var userId = await _context.Users.MaxAsync(u => (int?)u.Id) ?? 0 + 1; // Если пользователей нет, начнем с 1
