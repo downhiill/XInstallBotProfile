@@ -123,11 +123,14 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
         public async Task<FileContentResult> ExportStatisticInPdf(GetStatisticRequest request)
         {
+            // Включение режима отладки для выявления проблем с макетом
+            QuestPDF.Settings.EnableDebugging = true;
             QuestPDF.Settings.License = LicenseType.Community;
+
             // Получаем данные для экспорта
             var statisticData = await GetStatisticForExport(request);
 
-            // Загрузка изображения как byte[]
+            // Загрузка изображения
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "svglogo_instal 2.png");
             byte[] watermarkImageBytes = File.ReadAllBytes(imagePath);
 
@@ -136,89 +139,94 @@ namespace XInstallBotProfile.Service.AdminPanelService
             {
                 container.Page(page =>
                 {
-                    page.Size(PageSizes.A2);
-                    page.Margin(5, Unit.Centimetre);
+                    // Увеличиваем размер страницы и уменьшаем поля
+                    page.Size(PageSizes.A2.Landscape()); // Горизонтальная ориентация
+                    page.Margin(2, Unit.Centimetre); // Уменьшенные поля
                     page.PageColor(Colors.White);
-                    page.DefaultTextStyle(x => x.FontSize(12));
+                    page.DefaultTextStyle(x => x.FontSize(10)); // Уменьшаем размер шрифта
 
-                    // Все содержимое добавляется внутри одного вызова Content()
                     page.Content().Column(column =>
                     {
-                        // Водяной знак (выравнивание в правый верхний угол)
-                        column.Item().AlignRight().AlignTop()
-                            .Image(watermarkImageBytes, ImageScaling.FitHeight);
+                        // Водяной знак (прозрачный и меньшего размера)
+                        column.Item()
+                            .AlignRight()
+                            .AlignTop()
+                            .Width(150) // Фиксированная ширина
+                            .Image(watermarkImageBytes, ImageScaling.FitWidth);
 
                         // Заголовок
-                        column.Item().PaddingBottom(10)
+                        column.Item()
+                            .PaddingBottom(15)
                             .Text("Статистика")
-                            .SemiBold().FontSize(24).FontColor(Colors.Blue.Medium);
+                            .SemiBold()
+                            .FontSize(18)
+                            .FontColor(Colors.Blue.Medium);
 
                         // Таблица с данными
-                        column.Item().Table(table =>
-                        {
-                            table.ColumnsDefinition(columns =>
+                        column.Item()
+                            .MinimalBox() // Предотвращает переполнение
+                            .Table(table =>
                             {
-                                columns.RelativeColumn(); // Дата
-                                columns.RelativeColumn(); // Total
-                                columns.RelativeColumn(); // Ack
-                                columns.RelativeColumn(); // Win
-                                columns.RelativeColumn(); // ImpsCount
-                                columns.RelativeColumn(); // ClicksCount
-                                columns.RelativeColumn(); // StartsCount
-                                columns.RelativeColumn(); // CompletesCount
-                                columns.RelativeColumn(); // ShowRate
-                                columns.RelativeColumn(); // CTR
-                                columns.RelativeColumn(); // VTR
-                                columns.RelativeColumn(); // Тип рекламы
+                                // Уменьшаем ширину столбцов
+                                table.ColumnsDefinition(columns =>
+                                {
+                                    columns.ConstantColumn(80); // Дата (фиксированная ширина)
+                                    columns.RelativeColumn(1.5f); // Total
+                                    columns.RelativeColumn(1.5f); // Ack
+                                    columns.RelativeColumn(1.5f); // Win
+                                    columns.RelativeColumn(1.5f); // ImpsCount
+                                    columns.RelativeColumn(1.5f); // ClicksCount
+                                    columns.RelativeColumn(1.5f); // StartsCount
+                                    columns.RelativeColumn(1.5f); // CompletesCount
+                                    columns.RelativeColumn(1.5f); // ShowRate
+                                    columns.RelativeColumn(1.5f); // CTR
+                                    columns.RelativeColumn(1.5f); // VTR
+                                    columns.RelativeColumn(2); // Тип рекламы (шире)
+                                });
+
+                                // Заголовки столбцов (уменьшенный шрифт)
+                                table.Header(header =>
+                                {
+                                    foreach (var headerName in new[] { "Дата", "Total", "Ack", "Win", "ImpsCount", "ClicksCount", "StartsCount", "CompletesCount", "ShowRate", "CTR", "VTR", "Тип рекламы" })
+                                    {
+                                        header.Cell()
+                                            .Background(Colors.Grey.Lighten3)
+                                            .PaddingVertical(5)
+                                            .Text(headerName)
+                                            .FontSize(9)
+                                            .SemiBold();
+                                    }
+                                });
+
+                                // Данные (уменьшенный шрифт)
+                                foreach (var stat in statisticData.UserStatistics)
+                                {
+                                    table.Cell().Text(stat.Date.ToString("yyyy-MM-dd")).FontSize(8);
+                                    table.Cell().Text(stat.Total.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.Ack.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.Win.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.ImpsCount.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.ClicksCount.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.StartsCount.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.CompletesCount.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.ShowRate.ToString("F2")).FontSize(8);
+                                    table.Cell().Text(stat.Ctr.ToString("F2")).FontSize(8);
+                                    table.Cell().Text(stat.Vtr.ToString("F2")).FontSize(8);
+
+                                    string adType = "";
+                                    if (stat.IsDsp) adType += "DSP; ";
+                                    if (stat.IsDspInApp) adType += "In-App; ";
+                                    if (stat.IsDspBanner) adType += "Banner; ";
+                                    table.Cell().Text(adType.TrimEnd(';', ' ')).FontSize(8);
+                                }
                             });
-
-                            // Заголовки столбцов
-                            table.Header(header =>
-                            {
-                                header.Cell().Text("Дата");
-                                header.Cell().Text("Total");
-                                header.Cell().Text("Ack");
-                                header.Cell().Text("Win");
-                                header.Cell().Text("ImpsCount");
-                                header.Cell().Text("ClicksCount");
-                                header.Cell().Text("StartsCount");
-                                header.Cell().Text("CompletesCount");
-                                header.Cell().Text("ShowRate");
-                                header.Cell().Text("CTR");
-                                header.Cell().Text("VTR");
-                                header.Cell().Text("Тип рекламы");
-
-                                header.Cell().ColumnSpan(12).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
-                            });
-
-                            // Данные
-                            foreach (var stat in statisticData.UserStatistics)
-                            {
-                                table.Cell().Text(stat.Date.ToString("yyyy-MM-dd"));
-                                table.Cell().Text(stat.Total.ToString());
-                                table.Cell().Text(stat.Ack.ToString());
-                                table.Cell().Text(stat.Win.ToString());
-                                table.Cell().Text(stat.ImpsCount.ToString());
-                                table.Cell().Text(stat.ClicksCount.ToString());
-                                table.Cell().Text(stat.StartsCount.ToString());
-                                table.Cell().Text(stat.CompletesCount.ToString());
-                                table.Cell().Text(stat.ShowRate.ToString("F2"));
-                                table.Cell().Text(stat.Ctr.ToString("F2"));
-                                table.Cell().Text(stat.Vtr.ToString("F2"));
-
-                                string adType = "";
-                                if (stat.IsDsp) adType += "DSP; ";
-                                if (stat.IsDspInApp) adType += "In-App; ";
-                                if (stat.IsDspBanner) adType += "Banner; ";
-                                table.Cell().Text(adType.TrimEnd(';', ' '));
-                            }
-                        });
 
                         // Итоговые значения
-                        column.Item().PaddingTop(10)
+                        column.Item()
+                            .PaddingTop(10)
                             .Text(x =>
                             {
-                                x.Span("Итого: ");
+                                x.Span("Итого: ").SemiBold();
                                 x.Span($"Total: {statisticData.Total.Total}, Ack: {statisticData.Total.Ack}, Win: {statisticData.Total.Win}, ImpsCount: {statisticData.Total.ImpsCount}, ClicksCount: {statisticData.Total.ClicksCount}, StartsCount: {statisticData.Total.StartsCount}, CompletesCount: {statisticData.Total.CompletesCount}, ShowRate: {statisticData.Total.ShowRate:F2}, CTR: {statisticData.Total.Ctr:F2}, VTR: {statisticData.Total.Vtr:F2}");
                             });
                     });
