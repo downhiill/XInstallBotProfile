@@ -143,7 +143,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
 
                     page.Content().AlignRight().AlignTop()
-                .Image(watermarkImageBytes, ImageScaling.FitHeight);
+                    .Image(watermarkImageBytes, ImageScaling.FitHeight);
 
 
                     // Заголовок

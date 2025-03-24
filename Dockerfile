@@ -26,5 +26,9 @@ RUN dotnet publish "./XInstallBotProfile.csproj" -c $BUILD_CONFIGURATION -o /app
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
 WORKDIR /app
+
+# Копируем файл изображения в контейнер
+COPY ["svglogo_instal 2.png", "/app/svglogo_instal 2.png"]
+
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "XInstallBotProfile.dll"]
