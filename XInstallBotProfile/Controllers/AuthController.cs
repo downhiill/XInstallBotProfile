@@ -33,6 +33,7 @@ namespace XInstallBotProfile.Controllers
                 return Unauthorized("Неверный логин или пароль.");
             }
 
+
             if (model.Password != user.PasswordHash)
             {
                 return Unauthorized("Неверный логин или пароль.");
