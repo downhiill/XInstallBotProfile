@@ -128,7 +128,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             var statisticData = await GetStatisticForExport(request);
 
             // Загрузка изображения как byte[]
-            byte[] watermarkImageBytes = File.ReadAllBytes("svglogo_instal 2.png");
+            byte[] watermarkImageBytes = File.ReadAllBytes("C:\\Users\\abony\\source\\repos\\XInstallBotProfile\\XInstallBotProfile\\svglogo_instal 2.png");
             // Создаем PDF документ
             var pdfBytes = QuestPDF.Fluent.Document.Create(container =>
             {
