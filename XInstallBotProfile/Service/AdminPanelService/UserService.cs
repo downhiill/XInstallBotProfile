@@ -221,13 +221,59 @@ namespace XInstallBotProfile.Service.AdminPanelService
                                 }
                             });
 
+
+                        // Заголовок
+                        column.Item()
+                            .PaddingBottom(15)
+                            .Text("Итог")
+                            .SemiBold()
+                            .FontSize(18)
+                            .FontColor(Colors.Blue.Medium);
+
                         // Итоговые значения
                         column.Item()
-                            .PaddingTop(10)
-                            .Text(x =>
+                            .MinimalBox()
+                            .Table(total =>
                             {
-                                x.Span("Итого: ").SemiBold();
-                                x.Span($"Total: {statisticData.Total.Total}, Ack: {statisticData.Total.Ack}, Win: {statisticData.Total.Win}, ImpsCount: {statisticData.Total.ImpsCount}, ClicksCount: {statisticData.Total.ClicksCount}, StartsCount: {statisticData.Total.StartsCount}, CompletesCount: {statisticData.Total.CompletesCount}, ShowRate: {statisticData.Total.ShowRate:F2}, CTR: {statisticData.Total.Ctr:F2}, VTR: {statisticData.Total.Vtr:F2}");
+                                total.ColumnsDefinition(totalcolumns =>
+                                {
+                                    totalcolumns.RelativeColumn(1.5f); // Total
+                                    totalcolumns.RelativeColumn(1.5f); // Ack
+                                    totalcolumns.RelativeColumn(1.5f); // Win
+                                    totalcolumns.RelativeColumn(1.5f); // ImpsCount
+                                    totalcolumns.RelativeColumn(1.5f); // ClicksCount
+                                    totalcolumns.RelativeColumn(1.5f); // StartsCount
+                                    totalcolumns.RelativeColumn(1.5f); // CompletesCount
+                                    totalcolumns.RelativeColumn(1.5f); // ShowRate
+                                    totalcolumns.RelativeColumn(1.5f); // CTR
+                                    totalcolumns.RelativeColumn(1.5f); // VTR
+                                });
+
+                                // Заголовки столбцов (уменьшенный шрифт)
+                                total.Header(header =>
+                                {
+                                    foreach (var headerName in new[] { "Total", "Ack", "Win", "ImpsCount", "ClicksCount", "StartsCount", "CompletesCount", "ShowRate", "CTR", "VTR" })
+                                    {
+                                        header.Cell()
+                                            .Background(Colors.Grey.Lighten3)
+                                            .PaddingVertical(5)
+                                            .Text(headerName)
+                                            .FontSize(9)
+                                            .SemiBold();
+                                    }
+                                });
+
+                                    total.Cell().Text(statisticData.Total.Total.ToString()).FontSize(8);
+                                    total.Cell().Text(statisticData.Total.Ack.ToString()).FontSize(8);
+                                    total.Cell().Text(statisticData.Total.Win.ToString()).FontSize(8);
+                                    total.Cell().Text(statisticData.Total.ImpsCount.ToString()).FontSize(8);
+                                    total.Cell().Text(statisticData.Total.ClicksCount.ToString()).FontSize(8);
+                                    total.Cell().Text(statisticData.Total.StartsCount.ToString()).FontSize(8);
+                                    total.Cell().Text(statisticData.Total.CompletesCount.ToString()).FontSize(8);
+                                    total.Cell().Text(statisticData.Total.ShowRate.ToString("F2")).FontSize(8);
+                                    total.Cell().Text(statisticData.Total.Ctr.ToString("F2")).FontSize(8);
+                                    total.Cell().Text(statisticData.Total.Vtr.ToString("F2")).FontSize(8);
+
                             });
                     });
                 });
