@@ -9,7 +9,7 @@ namespace XInstallBotProfile.Controllers
 {
      // Это обеспечит доступ только для пользователей с ролью "Admin"
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [Route("api/admin")]
     public class AdminController : ControllerBase
     {
