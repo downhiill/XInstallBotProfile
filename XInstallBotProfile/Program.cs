@@ -36,7 +36,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.WithOrigins("https://weekkkk.github.io", "https://dsp.x-instals.com/") // Разрешённый источник
+        policy.WithOrigins("https://weekkkk.github.io", "https://dsp.x-instals.com") // Разрешённый источник
               .AllowAnyMethod()  // Разрешаем любые HTTP-методы (GET, POST и т. д.)
               .AllowAnyHeader() // Разрешаем любые заголовки
               .AllowCredentials();
