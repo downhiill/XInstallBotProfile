@@ -9,7 +9,7 @@ namespace XInstallBotProfile.Service.Bot
 {
     public class BotService
     {
-        private readonly string _botToken;
+        private readonly string _botToken = Environment.GetEnvironmentVariable("BOT_TOKEN");
         private readonly ApplicationDbContext _context;
 
         public BotService(string botToken, ApplicationDbContext context)
