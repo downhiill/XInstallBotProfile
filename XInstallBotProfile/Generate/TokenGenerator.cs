@@ -8,7 +8,7 @@ namespace XInstallBotProfile.Generate
 {
     public class TokenGenerator
     {
-        private static string _secretKey = "s2hG93b0qy32xvwp1PqX0M1aO9lmU4cT";
+        private static string _secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
 
         public static string GenerateAccessToken(string username, int userId, string role)
         {

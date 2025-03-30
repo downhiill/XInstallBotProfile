@@ -12,7 +12,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string botToken = "7595356206:AAGj07hm_3ll96KCuQJPBR03v53QDf1tGiU";
+string botToken = Environment.GetEnvironmentVariable("BOT_TOKEN");
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
@@ -36,9 +36,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.WithOrigins("https://weekkkk.github.io", "https://dsp.x-instals.com") // Разрешённый источник
-              .AllowAnyMethod()  // Разрешаем любые HTTP-методы (GET, POST и т. д.)
-              .AllowAnyHeader() // Разрешаем любые заголовки
+        policy.WithOrigins("https://weekkkk.github.io", "https://dsp.x-instals.com") 
+              .AllowAnyMethod()  
+              .AllowAnyHeader() 
               .AllowCredentials();
     });
 });
@@ -60,23 +60,23 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = false; // Включите это, если работаете в режиме без HTTPS, для продакшн — используйте HTTPS
+        options.RequireHttpsMetadata = false; 
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
-            ValidIssuer = "yourIssuer",  // Замените на значение, которое использовалось при создании токена
-            ValidAudience = "yourAudience",  // Замените на значение, которое использовалось при создании токена
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("s2hG93b0qy32xvwp1PqX0M1aO9lmU4cT"))  // Замените на ваш секретный ключ
+            ValidIssuer = "yourIssuer",  
+            ValidAudience = "yourAudience",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")))
         };
     });
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    options.MinimumSameSitePolicy = SameSiteMode.None; // Разрешаем передачу между сайтами
-    options.Secure = CookieSecurePolicy.Always; // Требуем HTTPS
+    options.MinimumSameSitePolicy = SameSiteMode.None; 
+    options.Secure = CookieSecurePolicy.Always; 
 });
 
 
