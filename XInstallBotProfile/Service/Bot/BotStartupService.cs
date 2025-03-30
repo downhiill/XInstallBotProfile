@@ -7,7 +7,7 @@ namespace XInstallBotProfile.Service.Bot
 {
     public class BotStartupService : BackgroundService
     {
-        private readonly string _botToken;
+        private readonly string _botToken = Environment.GetEnvironmentVariable("BOT_TOKEN");
         private readonly BotService _botService;
         private readonly ILogger<BotStartupService> _logger;
 
@@ -15,7 +15,7 @@ namespace XInstallBotProfile.Service.Bot
         {
             _botService = botService;
             _logger = logger;
-            _botToken = _botService.BotToken;  // Assuming BotToken is a public property of BotService
+            _botToken = _botService.BotToken;  
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
