@@ -27,13 +27,13 @@ var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
 var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUsername};Password={dbPassword}";
 
-// Используйте это подключение в контексте
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddScoped<UserBotService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-// Add BotService with factory method to resolve dependencies
+
 builder.Services.AddSingleton<BotService>(sp =>
 {
     var dbContext = sp.GetRequiredService<ApplicationDbContext>();
