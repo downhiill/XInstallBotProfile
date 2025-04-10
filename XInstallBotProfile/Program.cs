@@ -12,7 +12,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string botToken = Environment.GetEnvironmentVariable("BOT_TOKEN");
+var botToken = Environment.GetEnvironmentVariable("BOT_TOKEN");
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
