@@ -7,6 +7,7 @@ namespace XInstallBotProfile.Context
     {
         public DbSet<User> Users { get; set; }
         public DbSet<UserStatistic> UserStatistics { get; set; }
+        public DbSet<XInstallAppUserStat> XInstallAppUserStats { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
@@ -14,6 +15,7 @@ namespace XInstallBotProfile.Context
         {
             modelBuilder.Entity<User>().ToTable("user_auth_info");
             modelBuilder.Entity<UserStatistic>().ToTable("user_statistic");
+            modelBuilder.Entity<XInstallAppUserStat>().ToTable("xinstallapp_user_stat");
 
         }
     }

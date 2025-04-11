@@ -338,7 +338,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 username = user.Nickname,
                 IsDsp = user.IsDsp,
                 IsDspInApp = user.IsDspInApp,
-                IsDspBanner = user.IsDspBanner
+                IsDspBanner = user.IsDspBanner,
+                IsXInstallApp = user.IsXInstallApp
             };
 
             return response;
@@ -563,6 +564,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 IsDsp = true,
                 IsDspInApp = false,
                 IsDspBanner = false,
+                IsXInstallApp = false
             };
 
             _dbContext.Users.Add(user);
@@ -577,8 +579,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 Login = user.Login,
                 IsDsp = user.IsDsp,
                 IsDspInApp = user.IsDspInApp,
-                IsDspBanner = user.IsDspBanner
-                
+                IsDspBanner = user.IsDspBanner,
+                IsXInstallApp = user.IsXInstallApp
             };
         }
 
@@ -631,10 +633,11 @@ namespace XInstallBotProfile.Service.AdminPanelService
             user.IsDsp = request.IsDsp;
             user.IsDspInApp = request.IsDspInApp;
             user.IsDspBanner = request.IsDspBanner;
+            user.IsXInstallApp = request.IsXInstallApp;
 
             await _dbContext.SaveChangesAsync();
 
-            return new UpdateFlagsResponse { Id = user.Id, IsDsp = user.IsDsp, IsDspInApp = user.IsDspInApp, IsDspBanner = user.IsDspBanner };
+            return new UpdateFlagsResponse { Id = user.Id, IsDsp = user.IsDsp, IsDspInApp = user.IsDspInApp, IsDspBanner = user.IsDspBanner, IsXInstallApp = user.IsXInstallApp };
         }
 
         public async Task<bool> UpdateStatistic(UpdateStatisticRequest request)
@@ -649,7 +652,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 return false;
             }
 
-            // В зависимости от ключа, обновляем нужное поле
+
             // В зависимости от ключа, обновляем нужное поле
             switch (request.Key.ToLower())
             {
@@ -819,7 +822,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
             if (flagsRequest != null &&
                 (user.IsDsp != flagsRequest.IsDsp ||
                  user.IsDspInApp != flagsRequest.IsDspInApp ||
-                 user.IsDspBanner != flagsRequest.IsDspBanner))
+                 user.IsDspBanner != flagsRequest.IsDspBanner ||
+                 user.IsXInstallApp != flagsRequest.IsXInstallApp))
             {
                 return true;
             }

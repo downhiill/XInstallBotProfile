@@ -16,6 +16,7 @@
         public bool IsDsp { get; set; } = true;
         public bool IsDspInApp { get; set; } = false;
         public bool IsDspBanner { get; set; } = false;
+        public bool IsXInstallApp { get; set; } = false;
 
     }
 

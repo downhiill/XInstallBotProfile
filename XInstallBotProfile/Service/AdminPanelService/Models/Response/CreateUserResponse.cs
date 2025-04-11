@@ -11,5 +11,6 @@
         public bool IsDsp;
         public bool IsDspInApp;
         public bool IsDspBanner;
+        public bool IsXInstallApp;
     }
 }
