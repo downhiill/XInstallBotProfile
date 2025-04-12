@@ -43,6 +43,31 @@ namespace XInstallBotProfile.Controllers
             }
         }
 
+        [HttpGet("statistic-xinstall")]
+        public async Task<IActionResult> GetStatisticXInstallApp([FromQuery] GetStatisticXInstallAppRequest request)
+        {
+            try
+            {
+                // Получаем статистику, если все проверки прошли успешно
+                var result = await _userService.GetStatisticXInstallApp(request);
+                return Ok(result); // Возвращаем статус 200 с результатом
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // Если пользователь не авторизован, возвращаем 401 (Unauthorized)
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (ForbiddenAccessException ex)
+            {
+                return Forbid(); // Возвращаем статус 403
+            }
+            catch (Exception ex)
+            {
+                // Общая ошибка сервера
+                return StatusCode(500, new { message = "Произошла ошибка при обработке запроса." });
+            }
+        }
+
         [HttpPost("export-excel")]
         public async Task<IActionResult> ExportStatisticInExcel([FromQuery] GetStatisticRequest request)
         {

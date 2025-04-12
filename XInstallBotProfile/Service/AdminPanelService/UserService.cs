@@ -467,6 +467,60 @@ namespace XInstallBotProfile.Service.AdminPanelService
             };
         }
 
+        public async Task<GetStatisticXInstallAppResponse> GetStatisticXInstallApp(GetStatisticXInstallAppRequest request)
+        {
+            var currentUserId = GetCurrentUserId();
+            var currentUserRole = GetCurrentUserRole();
+
+            if (currentUserId == 0)
+            {
+                throw new UnauthorizedAccessException("Необходима авторизация для выполнения запроса.");
+            }
+
+            if (currentUserRole != "Admin" && request.UserId != currentUserId)
+            {
+                // Если пользователь не администратор и пытается запросить чужую информацию
+                throw new ForbiddenAccessException("У вас нет прав для запроса этой информации.");
+            }
+
+            var statisticsQuery = _dbContext.XInstallAppUserStats
+                 .Where(us => us.UserId == request.UserId);
+
+
+            var totalShowRate = await _dbContext.XInstallAppUserStats
+                .Where(us => us.UserId == request.UserId)
+                .SumAsync(us => us.Total);
+
+            // Фильтрация по дате, если параметры заданы
+            if (request.StartDate.HasValue)
+            {
+                statisticsQuery = statisticsQuery.Where(us => us.Date >= request.StartDate.Value);
+            }
+
+            if (request.EndDate.HasValue)
+            {
+                statisticsQuery = statisticsQuery.Where(us => us.Date <= request.EndDate.Value);
+            }
+
+            var statistics = await statisticsQuery.ToListAsync();
+
+
+            var statisticTotal = new StatisticTotalXInstall
+            {
+                Total = statistics.Sum(us => us.Total),
+                TotalIntasll = statistics.Sum(us => us.TotalInstall),
+            };
+
+
+
+            return new GetStatisticXInstallAppResponse
+            {
+                UserStatistics = statistics,
+                Total = statisticTotal,
+                TotalAllTime = totalShowRate
+            };
+        }
+
         private async Task<GetStatisticResponse> GetStatisticForExport(GetStatisticRequest request)
         {
             var statisticsQuery = _dbContext.UserStatistics
