@@ -8,7 +8,7 @@
         public string AppLink { get; set; }
         public string AppName { get; set; }
         public string Region { get; set; }
-        public string Keywords { get; set; }
+        public List<string> Keywords { get; set; } = new List<string>();
         public long TotalInstall { get; set; }
         public long Complited { get; set; }
     }

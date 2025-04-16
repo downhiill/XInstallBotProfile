@@ -673,7 +673,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 AppLink = request.AppLink,
                 AppName = request.AppName,
                 Region = request.Region,
-                Keywords = JsonConvert.DeserializeObject<List<string>>(request.Keywords) ?? new List<string>(),
+                Keywords = request.Keywords,
                 TotalInstall = request.TotalInstall,
                 Complited = request.Complited
             };
