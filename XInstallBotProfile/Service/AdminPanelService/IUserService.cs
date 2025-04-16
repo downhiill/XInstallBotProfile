@@ -21,6 +21,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
         public Task<GetStatisticXInstallAppResponse> GetStatisticXInstallApp(GetStatisticXInstallAppRequest request);
 
         public Task<bool> UpdateStatistic(UpdateStatisticRequest request);
+        public Task<bool> UpdateStatisticXInstallApp(UpdateStatisticXInstallAppRequest request);
 
         public Task<GenerateUserResponse> GenerateUser();
 

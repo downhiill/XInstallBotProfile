@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json;
 using OfficeOpenXml;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -749,6 +750,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
             }
 
 
+
+
             // Сохраняем изменения в базе данных
             await _dbContext.SaveChangesAsync();
 
@@ -756,6 +759,53 @@ namespace XInstallBotProfile.Service.AdminPanelService
             return true;
         }
 
+        public async Task<bool> UpdateStatisticXInstallApp(UpdateStatisticXInstallAppRequest request)
+        {
+            var statistic = await _dbContext.XInstallAppUserStats
+                .FirstOrDefaultAsync(us => us.Id == request.Id);
+
+            if(statistic == null)
+            {
+                return false;
+            }
+
+            switch (request.Key.ToLower())
+            {
+                case "total":
+                    statistic.Total = long.Parse(request.Value);
+                    break;
+                case "app_link":
+                    statistic.AppLink = request.Value;
+                    break;
+                case "app_name":
+                    statistic.AppName = request.Value;
+                    break;
+                case "date":
+                    var dateValue = DateTime.Parse(request.Value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                    statistic.Date = dateValue.ToUniversalTime(); // Преобразуем в UTC
+                    break;
+                case "region":
+                    statistic.Region = request.Value;
+                    break;
+                case "keywords":
+                    statistic.Keywords = JsonConvert.DeserializeObject<List<string>>(request.Value);
+                    break;
+                case "totalinstall":
+                    statistic.TotalInstall = long.Parse(request.Value);
+                    break;
+                case "complited":
+                    statistic.Complited = decimal.Parse(request.Value, CultureInfo.InvariantCulture);
+                    break;
+                default:
+                    return false;
+            }
+            // Сохраняем изменения в базе данных
+            await _dbContext.SaveChangesAsync();
+
+            // Возвращаем true, если операция прошла успешно
+            return true;
+
+        }
 
         public async Task DeleteUser(List<int> userIds)
         {

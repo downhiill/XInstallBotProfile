@@ -51,6 +51,14 @@ namespace XInstallBotProfile.Controllers
             var result = await _userService.UpdateUsername(id, request);
             return Ok(result);
         }
+
+        [HttpPatch("statistic-xinstall")]
+        public async Task<IActionResult> UpdateStatisticXInstallApp(UpdateStatisticXInstallAppRequest request)
+        {
+            var result = await _userService.UpdateStatisticXInstallApp(request);
+            return Ok(result);
+
+        }
         [HttpPatch("statistic")]
         public async Task<IActionResult> UpdateStatistic(UpdateStatisticRequest request)
         {
@@ -60,7 +68,6 @@ namespace XInstallBotProfile.Controllers
         }
 
         [HttpGet("user/{id}")]
-
         public async Task<IActionResult> GetUserById(int id)
         {
             var result = await _userService.GetUserById(id);

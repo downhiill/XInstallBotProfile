@@ -27,6 +27,6 @@ namespace XInstallBotProfile.Models
         }
 
         public long TotalInstall { get; set; }
-        public long Complited { get; set; }
+        public decimal Complited { get; set; }
     }
 }
