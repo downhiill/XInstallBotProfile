@@ -877,7 +877,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
             // Проверяем, есть ли изменения
             if (!HasUserChanged(user, request.UsernameRequest, request.FlagsRequest))
             {
-                return; // Ничего не изменилось — сохранять не нужно
+                return; 
             }
 
             // Обновляем никнейм, если передан запрос на его изменение
@@ -897,6 +897,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 user.IsDsp = request.FlagsRequest.IsDsp;
                 user.IsDspInApp = request.FlagsRequest.IsDspInApp;
                 user.IsDspBanner = request.FlagsRequest.IsDspBanner;
+                user.IsXInstallApp = request.FlagsRequest.IsXInstallApp;
             }
 
             // Сохраняем только если были изменения
