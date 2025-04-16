@@ -3,6 +3,7 @@
     public class CreateUserRecordXInstallAppRequest
     {
         public long Id { get; set; }
+        public int UserId { get; set; }
         public DateTime Date { get; set; }
         public long Total { get; set; }
         public string AppLink { get; set; }

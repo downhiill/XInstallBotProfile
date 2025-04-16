@@ -663,11 +663,11 @@ namespace XInstallBotProfile.Service.AdminPanelService
             return true;
         }
 
-        public async Task<bool> CreateUserRecordXInstallApp(int UserId, CreateUserRecordXInstallAppRequest request)
+        public async Task<bool> CreateUserRecordXInstallApp(CreateUserRecordXInstallAppRequest request)
         {
             var recordUser = new XInstallAppUserStat
             {
-                UserId = UserId,
+                UserId = request.UserId,
                 Date = request.Date.ToUniversalTime(),
                 Total = request.Total,
                 AppLink = request.AppLink,
