@@ -10,6 +10,6 @@
         public string Region { get; set; }
         public List<string> Keywords { get; set; } = new List<string>();
         public long TotalInstall { get; set; }
-        public long Complited { get; set; }
+        public decimal Complited { get; set; }
     }
 }
