@@ -50,8 +50,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 worksheet.Cells[1, 6].Value = "ClicksCount";
                 worksheet.Cells[1, 7].Value = "StartsCount";
                 worksheet.Cells[1, 8].Value = "CompletesCount";
-                worksheet.Cells[1, 9].Value = "ShowRate";
-                worksheet.Cells[1, 10].Value = "CTR";
+                worksheet.Cells[1, 9].Value = "ShowRate %";
+                worksheet.Cells[1, 10].Value = "CTR %";
                 worksheet.Cells[1, 11].Value = "VTR";
 
                 // Заполняем данные
@@ -81,8 +81,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 worksheet.Cells[row, 6].Value = statisticData.Total.ClicksCount;
                 worksheet.Cells[row, 7].Value = statisticData.Total.StartsCount;
                 worksheet.Cells[row, 8].Value = statisticData.Total.CompletesCount;
-                worksheet.Cells[row, 9].Value = statisticData.Total.ShowRate;
-                worksheet.Cells[row, 10].Value = statisticData.Total.Ctr;
+                worksheet.Cells[row, 9].Value = statisticData.Total.ShowRate + "%";
+                worksheet.Cells[row, 10].Value = statisticData.Total.Ctr + "%";
                 worksheet.Cells[row, 11].Value = statisticData.Total.Vtr;
 
                 // Добавляем средние значения
@@ -95,8 +95,8 @@ namespace XInstallBotProfile.Service.AdminPanelService
                 worksheet.Cells[row, 6].Value = statisticData.Averages.ClicksCount;
                 worksheet.Cells[row, 7].Value = statisticData.Averages.StartsCount;
                 worksheet.Cells[row, 8].Value = statisticData.Averages.CompletesCount;
-                worksheet.Cells[row, 9].Value = statisticData.Averages.ShowRate;
-                worksheet.Cells[row, 10].Value = statisticData.Averages.Ctr;
+                worksheet.Cells[row, 9].Value = statisticData.Averages.ShowRate + "%";
+                worksheet.Cells[row, 10].Value = statisticData.Averages.Ctr + "%";
                 worksheet.Cells[row, 11].Value = statisticData.Averages.Vtr;
 
                 // Форматируем заголовки
@@ -187,7 +187,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                                 // Заголовки столбцов (уменьшенный шрифт)
                                 table.Header(header =>
                                 {
-                                    foreach (var headerName in new[] { "Дата", "Total", "Ack", "Win", "ImpsCount", "ClicksCount", "StartsCount", "CompletesCount", "ShowRate", "CTR", "VTR", "Тип рекламы" })
+                                    foreach (var headerName in new[] { "Дата", "Total", "Ack", "Win", "ImpsCount", "ClicksCount", "StartsCount", "CompletesCount", "ShowRate %", "CTR %", "VTR", "Тип рекламы" })
                                     {
                                         header.Cell()
                                             .Background(Colors.Grey.Lighten3)
@@ -252,7 +252,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                                 // Заголовки столбцов (уменьшенный шрифт)
                                 total.Header(header =>
                                 {
-                                    foreach (var headerName in new[] { "Total", "Ack", "Win", "ImpsCount", "ClicksCount", "StartsCount", "CompletesCount", "ShowRate", "CTR", "VTR" })
+                                    foreach (var headerName in new[] { "Total", "Ack", "Win", "ImpsCount", "ClicksCount", "StartsCount", "CompletesCount", "ShowRate %", "CTR %", "VTR" })
                                     {
                                         header.Cell()
                                             .Background(Colors.Grey.Lighten3)
