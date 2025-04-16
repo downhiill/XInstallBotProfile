@@ -1,0 +1,15 @@
+﻿namespace XInstallBotProfile.Service.AdminPanelService.Models.Request
+{
+    public class CreateUserRecordXInstallAppRequest
+    {
+        public long Id { get; set; }
+        public DateTime Date { get; set; }
+        public long Total { get; set; }
+        public string AppLink { get; set; }
+        public string AppName { get; set; }
+        public string Region { get; set; }
+        public string Keywords { get; set; }
+        public long TotalInstall { get; set; }
+        public long Complited { get; set; }
+    }
+}

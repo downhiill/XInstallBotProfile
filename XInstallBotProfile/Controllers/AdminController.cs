@@ -97,6 +97,13 @@ namespace XInstallBotProfile.Controllers
             return Ok("Запись создана");
         }
 
+        [HttpPost("createUserRecord-xinstallapp")]
+        public async Task<IActionResult> CreateUserRecordXInstallApp(int UserId, [FromBody] CreateUserRecordXInstallAppRequest request)
+        {
+            await _userService.CreateUserRecordXInstallApp(UserId, request);
+            return Ok("Запись создана");
+        }
+
         [HttpPost("saveUserData")]
         public async Task<IActionResult> SaveUserData([FromBody] CreateUserRequest request)
         {

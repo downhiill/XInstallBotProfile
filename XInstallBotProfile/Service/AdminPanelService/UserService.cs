@@ -663,6 +663,27 @@ namespace XInstallBotProfile.Service.AdminPanelService
             return true;
         }
 
+        public async Task<bool> CreateUserRecordXInstallApp(int UserId, CreateUserRecordXInstallAppRequest request)
+        {
+            var recordUser = new XInstallAppUserStat
+            {
+                UserId = UserId,
+                Date = request.Date.ToUniversalTime(),
+                Total = request.Total,
+                AppLink = request.AppLink,
+                AppName = request.AppName,
+                Region = request.Region,
+                Keywords = JsonConvert.DeserializeObject<List<string>>(request.Keywords) ?? new List<string>(),
+                TotalInstall = request.TotalInstall,
+                Complited = request.Complited
+            };
+
+            _dbContext.XInstallAppUserStats.Add(recordUser);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
 
         public async Task<UpdateUsernameResponse> UpdateUsername(int id, UpdateUsernameRequest request)
         {
@@ -788,7 +809,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
                     statistic.Region = request.Value;
                     break;
                 case "keywords":
-                    statistic.Keywords = JsonConvert.DeserializeObject<List<string>>(request.Value);
+                    statistic.Keywords = JsonConvert.DeserializeObject<List<string>>(request.Value) ?? new List<string>();
                     break;
                 case "totalinstall":
                     statistic.TotalInstall = long.Parse(request.Value);
