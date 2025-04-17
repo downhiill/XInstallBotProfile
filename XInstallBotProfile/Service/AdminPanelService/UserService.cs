@@ -867,6 +867,27 @@ namespace XInstallBotProfile.Service.AdminPanelService
 
             return true;
         }
+        public async Task<bool> DeleteUserRecordsXInstallApp(List<long> ids)
+        {
+            // Находим записи, которые есть в списке
+            var recordsToDelete = await _dbContext.XInstallAppUserStats
+                .Where(us => ids.Contains(us.Id))
+                .ToListAsync();
+
+            // Если нет записей для удаления, возвращаем false
+            if (!recordsToDelete.Any())
+            {
+                return false;
+            }
+
+            // Удаляем найденные записи
+            _dbContext.XInstallAppUserStats.RemoveRange(recordsToDelete);
+
+            // Сохраняем изменения в базе данных
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
 
 
 

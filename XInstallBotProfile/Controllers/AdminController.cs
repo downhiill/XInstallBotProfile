@@ -141,7 +141,21 @@ namespace XInstallBotProfile.Controllers
             try
             {
                 await _userService.DeleteUserRecords(ids);
-                return Ok(new { message = "Пользователи успешно удалены!" });
+                return Ok(new { message = "Запис(ь)и успешно удален(ы)а!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("deleteUserRecord-xinstallapp")]
+        public async Task<IActionResult> DeleteUserRecordsXInstallApp([FromBody] List<long> ids)
+        {
+            try
+            {
+                await _userService.DeleteUserRecordsXInstallApp(ids);
+                return Ok(new { message = "Запис(ь)и успешно удален(ы)а!" });
             }
             catch (Exception ex)
             {

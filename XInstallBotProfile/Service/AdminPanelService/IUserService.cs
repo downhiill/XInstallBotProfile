@@ -18,6 +18,7 @@ namespace XInstallBotProfile.Service.AdminPanelService
         public void SaveUserAsync(CreateUserRequest request);
         public Task DeleteUser(List<int> userIds);
         public Task<bool> DeleteUserRecords(List<long> ids);
+        public Task<bool> DeleteUserRecordsXInstallApp(List<long> ids);
         public Task<GetStatisticResponse> GetStatistic(GetStatisticRequest request);
         public Task<GetStatisticXInstallAppResponse> GetStatisticXInstallApp(GetStatisticXInstallAppRequest request);
 
