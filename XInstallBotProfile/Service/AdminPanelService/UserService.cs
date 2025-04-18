@@ -122,6 +122,70 @@ namespace XInstallBotProfile.Service.AdminPanelService
             }
         }
 
+        public async Task<FileContentResult> ExportStatisticInExcelXInstallApp(GetStatisticXInstallAppRequest request)
+        {
+            // Получаем данные для экспорта
+            var statisticData = await GetStatisticXInstallApp(request);
+
+            // Создаем Excel файл
+            using (var package = new ExcelPackage())
+            {
+                // Создаем лист
+                var worksheet = package.Workbook.Worksheets.Add("Статистика");
+
+                // Заголовки столбцов
+                worksheet.Cells[1, 1].Value = "Дата";
+                worksheet.Cells[1, 2].Value = "Total";
+                worksheet.Cells[1, 3].Value = "App link";
+                worksheet.Cells[1, 4].Value = "App name";
+                worksheet.Cells[1, 5].Value = "Region";
+                worksheet.Cells[1, 6].Value = "Keywords";
+                worksheet.Cells[1, 7].Value = "Total Install";
+                worksheet.Cells[1, 8].Value = "Complited %";
+
+
+                // Заполняем данные
+                int row = 2;
+                foreach (var stat in statisticData.UserStatistics)
+                {
+                    worksheet.Cells[row, 1].Value = stat.Date.ToString("yyyy-MM-dd");
+                    worksheet.Cells[row, 2].Value = stat.Total;
+                    worksheet.Cells[row, 3].Value = stat.AppLink;
+                    worksheet.Cells[row, 4].Value = stat.AppName;
+                    worksheet.Cells[row, 5].Value = stat.Region;
+                    worksheet.Cells[row, 6].Value = stat.Keywords;
+                    worksheet.Cells[row, 7].Value = stat.TotalInstall;
+                    worksheet.Cells[row, 8].Value = stat.Complited;
+                    row++;
+                }
+
+                // Добавляем итоговые значения
+                worksheet.Cells[row, 1].Value = "Итого";
+                worksheet.Cells[row, 2].Value = statisticData.Total.Total;
+                worksheet.Cells[row, 3].Value = statisticData.Total.TotalIntasll;
+
+                // Форматируем заголовки
+                using (var range = worksheet.Cells[1, 1, 1, 8])
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                }
+
+                // Автонастройка ширины столбцов
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                // Преобразуем в массив байтов
+                var fileContents = package.GetAsByteArray();
+
+                // Возвращаем файл
+                return new FileContentResult(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    FileDownloadName = $"Статистика_{request.StartDate?.ToString("yyyy-MM-dd")}_{request.EndDate?.ToString("yyyy-MM-dd")}.xlsx"
+                };
+            }
+        }
+
         public async Task<FileContentResult> ExportStatisticInPdf(GetStatisticRequest request)
         {
             // Включение режима отладки для выявления проблем с макетом
@@ -274,6 +338,143 @@ namespace XInstallBotProfile.Service.AdminPanelService
                                     total.Cell().Text(statisticData.Total.ShowRate.ToString("F2")).FontSize(8);
                                     total.Cell().Text(statisticData.Total.Ctr.ToString("F2")).FontSize(8);
                                     total.Cell().Text(statisticData.Total.Vtr.ToString("F2")).FontSize(8);
+
+                            });
+                    });
+                });
+            })
+            .GeneratePdf();
+
+            // Возвращаем файл
+            return new FileContentResult(pdfBytes, "application/pdf")
+            {
+                FileDownloadName = $"Статистика_{request.StartDate?.ToString("yyyy-MM-dd")}_{request.EndDate?.ToString("yyyy-MM-dd")}.pdf"
+            };
+        }
+
+        public async Task<FileContentResult> ExportStatisticInPdfXInstallApp(GetStatisticXInstallAppRequest request)
+        {
+            // Включение режима отладки для выявления проблем с макетом
+            QuestPDF.Settings.EnableDebugging = true;
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            // Получаем данные для экспорта
+            var statisticData = await GetStatisticXInstallApp(request);
+
+            // Загрузка изображения
+            string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "svglogo_instal 2.png");
+            byte[] watermarkImageBytes = File.ReadAllBytes(imagePath);
+
+            // Создаем PDF документ
+            var pdfBytes = QuestPDF.Fluent.Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    // Увеличиваем размер страницы и уменьшаем поля
+                    page.Size(PageSizes.A2.Landscape()); // Горизонтальная ориентация
+                    page.Margin(2, Unit.Centimetre); // Уменьшенные поля
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(10)); // Уменьшаем размер шрифта
+
+                    page.Content().Column(column =>
+                    {
+                        // Водяной знак (прозрачный и меньшего размера)
+                        column.Item()
+                            .AlignRight()
+                            .AlignTop()
+                            .Width(150) // Фиксированная ширина
+                            .Image(watermarkImageBytes, ImageScaling.FitWidth);
+
+                        // Заголовок
+                        column.Item()
+                            .PaddingBottom(15)
+                            .Text("Статистика")
+                            .SemiBold()
+                            .FontSize(18)
+                            .FontColor(Colors.Blue.Medium);
+
+                        // Таблица с данными
+                        column.Item()
+                            .MinimalBox() // Предотвращает переполнение
+                            .Table(table =>
+                            {
+                                // Уменьшаем ширину столбцов
+                                table.ColumnsDefinition(columns =>
+                                {
+                                    columns.ConstantColumn(80); // Дата (фиксированная ширина)
+                                    columns.RelativeColumn(1.5f); // Total
+                                    columns.RelativeColumn(1.5f); // App link
+                                    columns.RelativeColumn(1.5f); // App name
+                                    columns.RelativeColumn(1.5f); // Region
+                                    columns.RelativeColumn(1.5f); // Keyword
+                                    columns.RelativeColumn(1.5f); // Total Install
+                                    columns.RelativeColumn(1.5f); // Complited
+                                });
+
+                                // Заголовки столбцов (уменьшенный шрифт)
+                                table.Header(header =>
+                                {
+                                    foreach (var headerName in new[] { "Дата", "Total", "App link", "App name", "Region", "Keyword", "Total Install", "Complited %" })
+                                    {
+                                        header.Cell()
+                                            .Background(Colors.Grey.Lighten3)
+                                            .PaddingVertical(5)
+                                            .Text(headerName)
+                                            .FontSize(9)
+                                            .SemiBold();
+                                    }
+                                });
+
+                                // Данные (уменьшенный шрифт)
+                                foreach (var stat in statisticData.UserStatistics)
+                                {
+                                    table.Cell().Text(stat.Date.ToString("yyyy-MM-dd")).FontSize(8);
+                                    table.Cell().Text(stat.Total.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.AppLink.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.AppName.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.Region.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.Keywords.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.TotalInstall.ToString()).FontSize(8);
+                                    table.Cell().Text(stat.Complited.ToString()).FontSize(8);
+                                }
+                            });
+
+
+                        // Заголовок
+                        column.Item()
+                            .PaddingBottom(15)
+                            .Text("Итог")
+                            .SemiBold()
+                            .FontSize(18)
+                            .FontColor(Colors.Blue.Medium);
+
+                        // Итоговые значения
+                        column.Item()
+                            .MinimalBox()
+                            .Table(total =>
+                            {
+                                total.ColumnsDefinition(totalcolumns =>
+                                {
+                                    totalcolumns.RelativeColumn(1.5f); // Total
+                                    totalcolumns.RelativeColumn(1.5f); // Total Install
+                                });
+
+                                // Заголовки столбцов (уменьшенный шрифт)
+                                total.Header(header =>
+                                {
+                                    foreach (var headerName in new[] { "Total","Total Install"})
+                                    {
+                                        header.Cell()
+                                            .Background(Colors.Grey.Lighten3)
+                                            .PaddingVertical(5)
+                                            .Text(headerName)
+                                            .FontSize(9)
+                                            .SemiBold();
+                                    }
+                                });
+
+                                total.Cell().Text(statisticData.Total.Total.ToString()).FontSize(8);
+                                total.Cell().Text(statisticData.Total.TotalIntasll.ToString()).FontSize(8);
 
                             });
                     });

@@ -92,6 +92,53 @@ namespace XInstallBotProfile.Controllers
             }
         }
 
+        [HttpPost("export-excel-xinstallapp")]
+        public async Task<IActionResult> ExportStatisticInExcelXInstallApp([FromQuery] GetStatisticXInstallAppRequest request)
+        {
+            try
+            {
+                var fileResult = await _userService.ExportStatisticInExcelXInstallApp(request);
+                return fileResult;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (ForbiddenAccessException ex)
+            {
+                return Forbid();
+            }
+            catch (Exception ex)
+            {
+                // Логирование ошибки
+                Console.WriteLine(ex);
+                return StatusCode(500, new { message = "Произошла ошибка при обработке запроса." });
+            }
+        }
+
+        [HttpPost("export-pdf-xinstall")]
+        public async Task<IActionResult> ExportStatisticInPdfXInstallApp([FromQuery] GetStatisticXInstallAppRequest request)
+        {
+            try
+            {
+                var fileResult = await _userService.ExportStatisticInPdfXInstallApp(request);
+                return fileResult;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (ForbiddenAccessException ex)
+            {
+                return Forbid();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);  
+                return StatusCode(500, new { message = "Произошла ошибка при обработке запроса." });
+            }
+        }
+
         [HttpPost("export-pdf")]
         public async Task<IActionResult> ExportStatisticInPdf([FromQuery] GetStatisticRequest request)
         {
